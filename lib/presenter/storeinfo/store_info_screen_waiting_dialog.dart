@@ -1,16 +1,20 @@
 import 'package:animated_flip_counter/animated_flip_counter.dart';
 import 'package:flutter/material.dart';
-import 'package:orre_web/services/debug.services.dart';
 import 'package:flutter/services.dart';
-
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:orre_web/services/debug.services.dart';
-import 'package:orre_web/provider/network/websocket/store_waiting_usercall_list_state_notifier.dart';
+import 'package:go_router/go_router.dart';
+import 'package:orre_web/provider/network/websocket/stomp_client_state_notifier.dart';
+import 'package:orre_web/provider/network/websocket/store_detail_info_state_notifier.dart';
 import 'package:orre_web/provider/userinfo/user_info_state_notifier.dart';
+import 'package:orre_web/services/debug.services.dart';
 import 'package:orre_web/widget/popup/alert_popup_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 import 'package:orre_web/widget/text_field/text_input_widget.dart';
 import '../../../provider/network/websocket/store_waiting_info_request_state_notifier.dart';
+import '../../services/network/https_services.dart';
+
+final waitingSuccessDialogProvider = StateProvider<bool?>((ref) => null);
 
 final peopleNumberProvider = StateProvider<int>((ref) => 1);
 
@@ -28,17 +32,15 @@ class WaitingDialog extends ConsumerWidget {
 
   WaitingDialog({required this.storeCode, required this.waitingState});
 
-  // 웨이팅 시작을 위한 정보 입력 다이얼로그 표시
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final phoneNumberController = ref.watch(waitingPhoneNumberProvider);
-    final numberOfPersonControlloer = ref.watch(peopleNumberProvider);
-
+    final numberOfPerson = ref.watch(peopleNumberProvider);
     final formKey = ref.watch(waitingFormKeyProvider);
 
     return AlertDialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10), // 모서리를 직각으로 설정
+        borderRadius: BorderRadius.circular(10),
       ),
       backgroundColor: Colors.white,
       title: TextWidget("웨이팅 시작 / 조회"),
@@ -59,50 +61,42 @@ class WaitingDialog extends ConsumerWidget {
               ref: ref,
             ),
             SizedBox(height: 16),
-            Consumer(builder: (context, ref, child) {
-              return Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  IconButton(
-                    icon: Icon(
-                      Icons.remove,
-                      color: Color(0xFFFFB74D),
-                    ),
-                    onPressed: () {
-                      if (numberOfPersonControlloer > 1) {
-                        ref.read(peopleNumberProvider.notifier).state--;
-                      }
-                    },
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.remove, color: Color(0xFFFFB74D)),
+                  onPressed: () {
+                    if (numberOfPerson > 1) {
+                      ref.read(peopleNumberProvider.notifier).state--;
+                    }
+                  },
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  width: 75,
+                  height: 75,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Color(0xFFFFB74D), width: 2),
+                    borderRadius: BorderRadius.circular(30),
                   ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                    width: 75,
-                    height: 75,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Color(0xFFFFB74D), width: 2),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: AnimatedFlipCounter(
-                      value: numberOfPersonControlloer,
-                      suffix: "명",
-                      textStyle: TextStyle(
-                        fontFamily: 'Dovemayo_gothic',
-                        fontSize: 36,
-                      ),
+                  child: AnimatedFlipCounter(
+                    value: numberOfPerson,
+                    suffix: "명",
+                    textStyle: TextStyle(
+                      fontFamily: 'Dovemayo_gothic',
+                      fontSize: 36,
                     ),
                   ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.add,
-                      color: Color(0xFFFFB74D),
-                    ),
-                    onPressed: () {
-                      ref.read(peopleNumberProvider.notifier).state++;
-                    },
-                  ),
-                ],
-              );
-            }),
+                ),
+                IconButton(
+                  icon: Icon(Icons.add, color: Color(0xFFFFB74D)),
+                  onPressed: () {
+                    ref.read(peopleNumberProvider.notifier).state++;
+                  },
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -117,18 +111,13 @@ class WaitingDialog extends ConsumerWidget {
           child: TextWidget("확인"),
           onPressed: () {
             if (formKey.currentState!.validate()) {
-              // 여기에서 입력된 정보를 처리합니다.
-              // 예를 들어, 웨이팅 요청을 서버에 보내는 로직을 구현할 수 있습니다.
-              printd("전화번호: ${phoneNumberController.text}");
-              printd("인원 수: ${numberOfPersonControlloer}");
-              printd("가게 코드: $storeCode");
-              printd("웨이팅 시작");
-              subscribeAndShowDialog(
-                  context,
-                  storeCode,
-                  phoneNumberController.text,
-                  numberOfPersonControlloer.toString(),
-                  ref);
+              // 입력된 정보를 처리합니다.
+              print("전화번호: ${phoneNumberController.text}");
+              print("인원 수: $numberOfPerson");
+              print("가게 코드: $storeCode");
+              print("웨이팅 시작");
+              subscribeAndShowDialog(context, storeCode,
+                  phoneNumberController.text, numberOfPerson.toString(), ref);
               Navigator.of(context).pop();
             }
           },
@@ -140,62 +129,40 @@ class WaitingDialog extends ConsumerWidget {
   void subscribeAndShowDialog(BuildContext context, int storeCode,
       String phoneNumber, String numberOfPersons, WidgetRef ref) {
     // 스트림 구독
-    printd("subscribeAndShowDialog");
-    final stream =
-        ref.watch(storeWaitingRequestNotifierProvider.notifier).startSubscribe(
-              storeCode,
-              phoneNumber,
-              int.parse(numberOfPersons),
-            );
-    ref.read(storeWaitingRequestNotifierProvider.notifier).sendWaitingRequest(
-          storeCode,
-          phoneNumber,
-          int.parse(numberOfPersons),
-        );
+    print("subscribeAndShowDialog");
 
-    printd("stream: $stream");
-    // 스트림의 각 결과에 대해 다른 대화 상자를 표시
-    stream.then((result) {
-      printd("result: $result");
-      if (result) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          final myWaitingInfo = ref.read(storeWaitingRequestNotifierProvider);
-          ref
-              .read(storeWaitingUserCallNotifierProvider.notifier)
-              .subscribeToUserCall(storeCode, myWaitingInfo!.token.waiting);
+    ref
+        .read(storeWaitingRequestNotifierProvider.notifier)
+        .subscribeToStoreWaitingRequest(
+            storeCode, phoneNumber, int.parse(numberOfPersons))
+        .then((value) {
+      printd("웨이팅 성공 여부: $value");
+      // 웨이팅 성공 여부에 따라
+      if (value == APIResponseStatus.success) {
+        // 성공했다면 전화번호가 포함된 링크로 이동
 
-          // 결과가 true 일 때의 대화 상자
-          showDialog(
-            context: context,
-            builder: (context) => AlertPopupWidget(
-              title: '웨이팅 성공',
-              subtitle: '대기번호 ${myWaitingInfo.token.waiting}번으로 웨이팅 되었습니다.',
-              buttonText: 'OK',
-            ),
-          );
-        });
+        ref.read(waitingSuccessDialogProvider.notifier).state = true;
+        ref.read(streamActiveProvider.notifier).state = false;
+        ref.read(storeDetailInfoProvider.notifier).clearStoreDetailInfo();
+        context.go('/reservation/$storeCode/$phoneNumber');
+      } else if (value == APIResponseStatus.waitingAlreadyJoin) {
+        // 이미 웨이팅에 참가한 경우
+        ref.read(waitingSuccessDialogProvider.notifier).state = false;
+        ref.read(streamActiveProvider.notifier).state = false;
+        ref.read(storeDetailInfoProvider.notifier).clearStoreDetailInfo();
+
+        context.go('/reservation/$storeCode/$phoneNumber');
       } else {
-        // 결과가 false 일 때의 대화 상자
+        // 웨이팅 참가에 실패할 때의 대화 상자
         showDialog(
           context: context,
-          builder: (context) => AlertPopupWidget(
+          builder: (context) => const AlertPopupWidget(
             title: '웨이팅 실패',
             subtitle: '잠시 후에 다시 시도해 주세요.',
             buttonText: '확인',
           ),
         );
       }
-    }, onError: (error) {
-      // 스트림에서 에러 발생 시 처리
-      printd("waiting error: ${error}");
-      showDialog(
-        context: context,
-        builder: (context) => AlertPopupWidget(
-          title: '웨이팅 에러',
-          subtitle: '잠시 후에 다시 시도해 주세요.',
-          buttonText: '확인',
-        ),
-      );
     });
   }
 }

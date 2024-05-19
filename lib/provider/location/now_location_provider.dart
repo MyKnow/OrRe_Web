@@ -10,9 +10,16 @@ final nowLocationProvider =
 });
 
 class LocationStateNotifier extends StateNotifier<LocationInfo?> {
+  bool _isUpdating = false;
+
   LocationStateNotifier(Ref _ref) : super(null) {}
 
   Future<LocationInfo?> updateNowLocation() async {
+    if (_isUpdating) {
+      return state;
+    }
+
+    _isUpdating = true;
     printd("nowLocationProvider updateNowLocation");
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
@@ -22,6 +29,7 @@ class LocationStateNotifier extends StateNotifier<LocationInfo?> {
         // 권한 거부되었을 때의 상태 반환
         printd("위치 권한 거부 : $permission");
         state = null;
+        _isUpdating = false;
         return null;
       } else if (permission == LocationPermission.whileInUse ||
           permission == LocationPermission.always) {
@@ -56,13 +64,17 @@ class LocationStateNotifier extends StateNotifier<LocationInfo?> {
           latitude: position.latitude,
           longitude: position.longitude);
     }
+
+    _isUpdating = false;
     return state;
   }
 
   Stream<LocationInfo?> watchNowLocation() async* {
-    while (true) {
-      yield await updateNowLocation();
-      await Future.delayed(const Duration(seconds: 10));
+    if (!_isUpdating) {
+      while (true) {
+        yield await updateNowLocation();
+        await Future.delayed(const Duration(seconds: 10));
+      }
     }
   }
 }

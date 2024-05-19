@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:orre_web/presenter/waiting/waiting_screen.dart';
 import 'package:orre_web/services/debug.services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -50,7 +51,8 @@ final GoRouter _router = GoRouter(
         final storeCode = int.parse(state.pathParameters['storeCode']!);
         final userPhoneNumber =
             state.pathParameters['userPhoneNumber']!.replaceAll('-', '');
-        return StoreDetailInfoWidget(userPhoneNumber, storeCode: storeCode);
+        return WaitingScreen(
+            storeCode: storeCode, userPhoneNumber: userPhoneNumber);
       },
     ),
   ],

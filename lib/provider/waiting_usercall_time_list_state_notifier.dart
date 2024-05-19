@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:orre_web/services/debug.services.dart';
 import 'package:orre_web/provider/network/websocket/store_waiting_info_request_state_notifier.dart';
-import 'package:orre_web/services/debug.services.dart';
 
 class WaitingUserCallTimeListStateNotifier extends StateNotifier<Duration?> {
   DateTime? userCallTime;
@@ -14,7 +13,9 @@ class WaitingUserCallTimeListStateNotifier extends StateNotifier<Duration?> {
 
   // Sets the user call time and starts a timer to update the remaining time
   void setUserCallTime(DateTime userCallTime) {
-    if (userCallTime.isBefore(DateTime.now().toUtc())) {
+    if (userCallTime
+        .toUtc()
+        .isBefore(DateTime.now().toUtc().add(const Duration(hours: 9)))) {
       printd("유저 호출 시간이 현재 시간보다 이전입니다.");
       deleteTimer();
       return;
@@ -41,10 +42,10 @@ class WaitingUserCallTimeListStateNotifier extends StateNotifier<Duration?> {
       deleteTimer();
       return;
     }
-    final currentTime = DateTime.now().toUtc();
+    final currentTime = DateTime.now().toUtc().add(const Duration(hours: 9));
 
     // Convert userCallTime to local time
-    final localUserCallTime = userCallTime!.toLocal();
+    final localUserCallTime = userCallTime!.toUtc();
 
     printd("유저 호출 시간 (로컬): $localUserCallTime");
     printd("현재 시간: $currentTime");
@@ -55,6 +56,9 @@ class WaitingUserCallTimeListStateNotifier extends StateNotifier<Duration?> {
       return;
     } else {
       printd("유저 호출 시간이 지나지 않았습니다.");
+      printd(
+          "유저 호출 시간까지 남은 시간: ${localUserCallTime.difference(currentTime).inSeconds}");
+      state = localUserCallTime.difference(currentTime);
     }
   }
 

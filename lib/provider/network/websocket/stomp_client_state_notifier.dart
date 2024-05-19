@@ -14,6 +14,7 @@ import 'package:stomp_dart_client/stomp_dart_client.dart';
 
 final stompErrorStack = StateProvider<int>((ref) => 0);
 final firstStompSetup = StateProvider<bool>((ref) => false);
+final streamActiveProvider = StateProvider<bool>((ref) => true);
 
 enum StompStatus {
   CONNECTED,
@@ -36,10 +37,7 @@ class StompClientStateNotifier extends StateNotifier<StompClient?> {
   StompClientStateNotifier(this.ref) : super(null);
 
   Future<bool> connect() async {
-    final stream = configureClient();
-    stream.listen((event) {
-      printd("stompClientStateNotifierProvider event : $event");
-    });
+    configureClient();
     return true;
   }
 
@@ -81,7 +79,7 @@ class StompClientStateNotifier extends StateNotifier<StompClient?> {
             // 연결 끊김 시 재시도 로직
           },
           onDebugMessage: (message) {
-            printd("debug message: ${message.toString()}");
+            // printd("debug: $message");
           },
           heartbeatIncoming: Duration(seconds: 1),
           heartbeatOutgoing: Duration(seconds: 1),
@@ -89,14 +87,8 @@ class StompClientStateNotifier extends StateNotifier<StompClient?> {
         ),
       );
 
-      Future.delayed(Duration(milliseconds: 10), () {
-        if (client.connected) {
-          printd("이미 연결되어 있음");
-          return;
-        }
-        state = client;
-        state?.activate();
-      });
+      state = client;
+      state?.activate();
     }
     return streamController.stream;
   }
@@ -146,6 +138,7 @@ class StompClientStateNotifier extends StateNotifier<StompClient?> {
   }
 
   Future<void> disconnect() async {
-    client.deactivate();
+    state?.deactivate();
+    state = null;
   }
 }

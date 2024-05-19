@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:orre_web/services/debug.services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:orre_web/services/debug.services.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 
 import 'store_info_screen_waiting_cancel_dialog.dart';

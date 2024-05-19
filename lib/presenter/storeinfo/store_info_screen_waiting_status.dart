@@ -1,17 +1,13 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:orre_web/services/debug.services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:orre_web/services/debug.services.dart';
 import 'package:orre_web/model/location_model.dart';
 import 'package:orre_web/model/store_waiting_info_model.dart';
 import 'package:orre_web/model/store_waiting_request_model.dart';
 import 'package:orre_web/provider/location/now_location_provider.dart';
 import 'package:orre_web/provider/network/https/get_service_log_state_notifier.dart';
-import 'package:orre_web/widget/loading_indicator/coustom_loading_indicator.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
-import '../../../provider/network/websocket/store_waiting_info_list_state_notifier.dart';
 import '../../../provider/network/websocket/store_waiting_usercall_list_state_notifier.dart';
 import '../../../provider/waiting_usercall_time_list_state_notifier.dart';
 import '../../provider/network/websocket/stomp_client_state_notifier.dart';
@@ -21,12 +17,11 @@ import '../../provider/network/websocket/store_waiting_info_state_notifier.dart'
 class WaitingStatusWidget extends ConsumerStatefulWidget {
   final int storeCode;
   final LocationInfo locationInfo;
-  final UserLogs? userLog;
-  const WaitingStatusWidget(
-      {super.key,
-      required this.storeCode,
-      required this.locationInfo,
-      required this.userLog});
+  const WaitingStatusWidget({
+    super.key,
+    required this.storeCode,
+    required this.locationInfo,
+  });
   @override
   // ignore: library_private_types_in_public_api
   _WaitingStatusWidgetState createState() => _WaitingStatusWidgetState();
@@ -38,13 +33,7 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if (widget.userLog != null) {
-        ref
-            .read(storeWaitingRequestNotifierProvider.notifier)
-            .repairStateByServiceLog(widget.userLog!);
-      }
-    });
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {});
   }
 
   @override
@@ -58,10 +47,10 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
     super.didChangeAppLifecycleState(state);
     switch (state) {
       case AppLifecycleState.inactive:
-        if (kDebugMode) print('App is inactive');
+        printd('App is inactive');
         break;
       case AppLifecycleState.paused:
-        if (kDebugMode) print('App is in background');
+        printd('App is in background');
 
         // storeInfo 구독 해제
         ref
@@ -69,7 +58,7 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
             .clearWaitingInfo();
         break;
       case AppLifecycleState.resumed:
-        if (kDebugMode) print('App is in foreground');
+        printd('App is in foreground');
 
         ref
             .refresh(storeWaitingInfoNotifierProvider.notifier)
@@ -79,7 +68,7 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
             .reconnectByState();
         break;
       case AppLifecycleState.detached:
-        if (kDebugMode) print('App is detached');
+        printd('App is detached');
         break;
       case AppLifecycleState.hidden:
         break;
@@ -88,33 +77,26 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
 
   @override
   Widget build(BuildContext context) {
+    printd("WaitingStatusWidget build 진입");
     final stomp = ref.watch(stompClientStateNotifierProvider);
     final stompStatus = ref.watch(stompState);
-    final myWaitingInfo = ref.watch(storeWaitingRequestNotifierProvider);
-    final myUserCall = ref.watch(storeWaitingUserCallNotifierProvider);
-    final remainingTime = ref.watch(waitingUserCallTimeListProvider);
-    final isWaiting = ref.watch(isWaitingNow);
 
     if (stomp == null) {
-      if (kDebugMode) print("stomp null: $stomp");
+      printd("stomp null: $stomp");
     } else {
-      if (kDebugMode) print("stomp not null: $stomp");
+      printd("stomp not null: $stomp");
 
       if (stompStatus == StompStatus.DISCONNECTED) {
-        if (kDebugMode) print("stomp is not activated");
+        printd("stomp is not activated");
       } else if (stomp.isActive) {
         ref.read(storeWaitingInfoNotifierProvider.notifier).setClient(stomp);
-        ref
-            .read(storeWaitingUserCallNotifierProvider.notifier)
-            .setClient(stomp);
-        ref.read(storeWaitingRequestNotifierProvider.notifier).setClient(stomp);
-        if (kDebugMode) print("stomp 변경");
-        if (kDebugMode) print("stomp is activated?: ${stomp.isActive}");
-        if (kDebugMode) print("stomp is connected?: ${stomp.connected}");
+        printd("stomp 변경");
+        printd("stomp is activated?: ${stomp.isActive}");
+        printd("stomp is connected?: ${stomp.connected}");
         if (ref
             .read(storeWaitingInfoNotifierProvider.notifier)
             .isClientConnected()) {
-          if (kDebugMode) print("stomp is connected");
+          printd("stomp is connected");
           return StreamBuilder(
               stream: ref
                   .watch(storeWaitingInfoNotifierProvider.notifier)
@@ -122,16 +104,9 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   final waitingTeamList = snapshot.data?.enteringTeamList;
-                  if (kDebugMode) print("waitingTeamList: $waitingTeamList");
-                  if (kDebugMode) print("myWaitingInfo: $myWaitingInfo");
-                  if (kDebugMode) print("myUserCall: $myUserCall");
-                  if (kDebugMode) print("remainingTime: $remainingTime");
-                  if (kDebugMode) print("isWaiting: $isWaiting");
+                  printd("waitingTeamList: $waitingTeamList");
                   return SliverToBoxAdapter(
-                    child: (myWaitingInfo != null)
-                        ? buildMyWaitingStatus(myWaitingInfo, snapshot.data!,
-                            myUserCall, remainingTime)
-                        : buildGeneralWaitingStatus(snapshot.data!, ref),
+                    child: buildGeneralWaitingStatus(snapshot.data!, ref),
                   );
                 } else {
                   ref
@@ -165,6 +140,7 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
       StoreWaitingInfo storeWaitingInfo,
       UserCall? myUserCall,
       Duration? remainingTime) {
+    printd("buildMyWaitingStatus 진입");
     final myWaitingNumber = myWaitingInfo.token.waiting;
     final myWaitingIndex =
         storeWaitingInfo.waitingTeamList.indexOf(myWaitingNumber);
@@ -216,7 +192,7 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
       // TextWidget('내 웨이팅 전화번호: ${myWaitingInfo.token.phoneNumber}'),
       // TextWidget('남은 팀 수 : $myWaitingIndex'),
     ];
-    if (kDebugMode) print("myUserCall in buildMyWaitingStatus: $myUserCall");
+    printd("myUserCall in buildMyWaitingStatus: $myUserCall");
     if (myUserCall != null &&
         remainingTime != null &&
         remainingTime.inSeconds > 0) {
@@ -280,9 +256,12 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
 
   Widget buildGeneralWaitingStatus(
       StoreWaitingInfo storeWaitingInfo, WidgetRef ref) {
+    printd("buildGeneralWaitingStatus 진입");
     String distance;
+    final nowLocationStream =
+        ref.watch(nowLocationProvider.notifier).watchNowLocation();
     return StreamBuilder(
-        stream: ref.watch(nowLocationProvider.notifier).watchNowLocation(),
+        stream: nowLocationStream,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final nowLocation = snapshot.data;
