@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:orre_web/services/debug.services.dart';
 import 'package:flutter/services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:orre_web/services/debug.services.dart';
 import 'package:orre_web/provider/network/websocket/store_waiting_usercall_list_state_notifier.dart';
 
 import 'package:orre_web/widget/text/text_widget.dart';
@@ -60,9 +63,9 @@ class WaitingCancelDialog extends ConsumerWidget {
               Navigator.of(context).pop();
               // 여기에서 입력된 정보를 처리합니다.
               // 예를 들어, 웨이팅 취소 요청을 서버에 보내는 로직을 구현할 수 있습니다.
-              print("전화번호: ${phoneNumberController.text}");
-              print("가게 코드: $storeCode");
-              print("웨이팅 취소");
+              printd("전화번호: ${phoneNumberController.text}");
+              printd("가게 코드: $storeCode");
+              printd("웨이팅 취소");
               ref
                   .read(storeWaitingRequestNotifierProvider.notifier)
                   .sendWaitingCancelRequest(

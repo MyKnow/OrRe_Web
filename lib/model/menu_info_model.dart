@@ -1,3 +1,5 @@
+import 'package:orre_web/services/debug.services.dart';
+
 class MenuInfo {
   final String menu;
   final String introduce;
@@ -108,7 +110,7 @@ class MenuCategories {
         },
       );
     } catch (e) {
-      print(e);
+      printd(e);
       return MenuCategories.nullValue();
     }
   }

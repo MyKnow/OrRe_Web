@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:orre_web/services/debug.services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:orre_web/model/location_model.dart';
 import '../../services/geocording/geocording_library_service.dart'; // 추가
@@ -12,26 +13,26 @@ class LocationStateNotifier extends StateNotifier<LocationInfo?> {
   LocationStateNotifier(Ref _ref) : super(null) {}
 
   Future<LocationInfo?> updateNowLocation() async {
-    print("nowLocationProvider updateNowLocation");
+    printd("nowLocationProvider updateNowLocation");
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
         // 권한 거부되었을 때의 상태 반환
-        print("위치 권한 거부 : $permission");
+        printd("위치 권한 거부 : $permission");
         state = null;
         return null;
       } else if (permission == LocationPermission.whileInUse ||
           permission == LocationPermission.always) {
-        print("위치 권한 허용 : $permission");
+        printd("위치 권한 허용 : $permission");
       }
     }
 
     final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.bestForNavigation);
 
-    print(
+    printd(
         "nowLocationProvider : 현재 경도 : ${position.longitude}, 현재 위도 : ${position.latitude}");
 
     // 권한이 허용되었을 때 도로명 주소 변환 로직
@@ -40,7 +41,7 @@ class LocationStateNotifier extends StateNotifier<LocationInfo?> {
 
     // 내 도로명 주소를 불러올 수 없을 때의 상태 반환
     if (placemarks == null) {
-      print("현재 위치의 주소를 찾을 수 없습니다.");
+      printd("현재 위치의 주소를 찾을 수 없습니다.");
       state = LocationInfo(
         locationName: '현재 위치',
         address: '주소를 찾을 수 없습니다.',
@@ -48,7 +49,7 @@ class LocationStateNotifier extends StateNotifier<LocationInfo?> {
         longitude: position.longitude,
       );
     } else {
-      print("nowLocationProvider : $placemarks");
+      printd("nowLocationProvider : $placemarks");
       state = LocationInfo(
           locationName: '현재 위치',
           address: placemarks,

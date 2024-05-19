@@ -1,3 +1,5 @@
+import 'package:orre_web/services/debug.services.dart';
+
 class StoreWaitingRequest {
   final String status;
   final StoreWaitingRequestDetail token;
@@ -13,14 +15,14 @@ class StoreWaitingRequest {
     }
 
     final jsonStatus = json['status'];
-    print("jsonStatus: $jsonStatus");
+    printd("jsonStatus: $jsonStatus");
     final status = jsonStatus ?? '1101';
-    print("status: $status");
+    printd("status: $status");
 
     final jsonToken = json['token'];
-    print("jsonToken: $jsonToken");
+    printd("jsonToken: $jsonToken");
     final token = StoreWaitingRequestDetail.fromJson(jsonToken);
-    print("token: $token");
+    printd("token: $token");
 
     return StoreWaitingRequest(
       status: json['status'] ?? '1101',

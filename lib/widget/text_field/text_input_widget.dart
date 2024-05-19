@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:orre_web/services/debug.services.dart';
 import 'package:flutter/services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:orre_web/services/debug.services.dart';
+import 'package:orre_web/services/debug.services.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 
 class TextInputWidget extends ConsumerWidget {
@@ -128,7 +132,7 @@ class TextInputWidget extends ConsumerWidget {
               }
             },
             onChanged: (text) {
-              print(errorTextWidget(text, minLength, maxLength, isRequired,
+              printd(errorTextWidget(text, minLength, maxLength, isRequired,
                   isPassword:
                       autofillHints?.contains(AutofillHints.password) == true));
             }),

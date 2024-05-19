@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:orre_web/services/debug.services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:orre_web/services/debug.services.dart';
 import 'package:location/location.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../model/store_info_model.dart';
@@ -118,7 +121,7 @@ class _GoogleMapWidgetState extends ConsumerState<GoogleMapWidget> {
             LatLng(locationData.latitude!, locationData.longitude!);
         await _moveToLocation(currentLocation);
       } catch (e) {
-        print('Error getting location: $e');
+        printd('Error getting location: $e');
       }
     } else {
       await _moveToLocation(widget.coordinates);

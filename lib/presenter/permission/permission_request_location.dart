@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:orre_web/services/debug.services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:orre_web/services/debug.services.dart';
 import 'package:orre_web/widget/button/small_button_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -22,13 +25,13 @@ class _PermissionRequestLocationScreenState
     final status = await Permission.location.request();
     if (status.isGranted) {
       // Location permission granted, do something
-      print("Location permission granted");
+      printd("Location permission granted");
     } else if (status.isDenied) {
       // Location permission denied, show error message or handle accordingly
-      print("Location permission denied");
+      printd("Location permission denied");
     } else if (status.isPermanentlyDenied) {
       // Location permission permanently denied, show error message or handle accordingly
-      print("Location permission permanently denied");
+      printd("Location permission permanently denied");
     }
   }
 

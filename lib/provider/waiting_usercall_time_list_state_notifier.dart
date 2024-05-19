@@ -1,6 +1,9 @@
 import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:orre_web/services/debug.services.dart';
 import 'package:orre_web/provider/network/websocket/store_waiting_info_request_state_notifier.dart';
+import 'package:orre_web/services/debug.services.dart';
 
 class WaitingUserCallTimeListStateNotifier extends StateNotifier<Duration?> {
   DateTime? userCallTime;
@@ -12,11 +15,11 @@ class WaitingUserCallTimeListStateNotifier extends StateNotifier<Duration?> {
   // Sets the user call time and starts a timer to update the remaining time
   void setUserCallTime(DateTime userCallTime) {
     if (userCallTime.isBefore(DateTime.now().toUtc())) {
-      print("유저 호출 시간이 현재 시간보다 이전입니다.");
+      printd("유저 호출 시간이 현재 시간보다 이전입니다.");
       deleteTimer();
       return;
     } else {
-      print("유저 호출 시간이 현재 시간보다 이후입니다.");
+      printd("유저 호출 시간이 현재 시간보다 이후입니다.");
     }
     this.userCallTime = userCallTime;
     startTimer();
@@ -43,21 +46,21 @@ class WaitingUserCallTimeListStateNotifier extends StateNotifier<Duration?> {
     // Convert userCallTime to local time
     final localUserCallTime = userCallTime!.toLocal();
 
-    print("유저 호출 시간 (로컬): $localUserCallTime");
-    print("현재 시간: $currentTime");
+    printd("유저 호출 시간 (로컬): $localUserCallTime");
+    printd("현재 시간: $currentTime");
 
     if (currentTime.isAfter(localUserCallTime)) {
-      print("유저 호출 시간이 지났습니다.");
+      printd("유저 호출 시간이 지났습니다.");
       deleteTimer();
       return;
     } else {
-      print("유저 호출 시간이 지나지 않았습니다.");
+      printd("유저 호출 시간이 지나지 않았습니다.");
     }
   }
 
   // Stops the timer and cleans up
   void deleteTimer() {
-    print('Stopping and deleting timer');
+    printd('Stopping and deleting timer');
     timer?.cancel();
     timer = null;
     state = null; // Optionally reset state to null when the timer is stopped
@@ -69,7 +72,7 @@ class WaitingUserCallTimeListStateNotifier extends StateNotifier<Duration?> {
   // Disposes of the state notifier and its resources
   @override
   void dispose() {
-    print('Disposing WaitingUserCallTimeListStateNotifier');
+    printd('Disposing WaitingUserCallTimeListStateNotifier');
     deleteTimer();
     super.dispose();
   }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:orre_web/services/debug.services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:orre_web/presenter/error/network_error_screen.dart';
 import 'package:orre_web/presenter/error/server_error_screen.dart';
@@ -13,9 +15,9 @@ class ErrorScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final error = ref.watch(errorStateNotifierProvider);
 
-    print("ErrorScreen");
+    printd("ErrorScreen");
     error.forEach((element) {
-      print(element);
+      printd(element);
     });
 
     if (error.isEmpty) {

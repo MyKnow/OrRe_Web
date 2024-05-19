@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:orre_web/model/store_info_model.dart';
-import 'package:orre_web/provider/network/connectivity_state_notifier.dart';
-import 'package:orre_web/widget/popup/alert_popup_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 
 class StoreDetailInfoTestScreen extends ConsumerWidget {
@@ -34,9 +33,9 @@ class StoreDetailInfoTestScreen extends ConsumerWidget {
     //     );
     //   }
     // }, loading: () {
-    //   print('loading');
+    //   printd('loading');
     // }, error: (Object error, StackTrace stackTrace) {
-    //   print('error');
+    //   printd('error');
     // });
 
     return Scaffold(

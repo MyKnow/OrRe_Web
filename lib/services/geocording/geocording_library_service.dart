@@ -1,4 +1,5 @@
 import 'package:geocoding/geocoding.dart';
+import 'package:orre_web/services/debug.services.dart';
 
 // 위도와 경도로부터 주소를 문자열로 반환하는 비동기 함수입니다.
 Future<String?> getAddressFromLatLngLibrary(
@@ -16,7 +17,7 @@ Future<String?> getAddressFromLatLngLibrary(
       List<String> addressParts = [];
 
       // Debugging purposes
-      print(place);
+      printd(place);
 
       // 행정구역 정보를 추가하는 조건입니다. includeArea1이 true이고, administrativeArea가 비어있지 않을 때 추가합니다.
       if (includeArea1 &&
@@ -63,7 +64,7 @@ Future<String?> getAddressFromLatLngLibrary(
     }
   } catch (e) {
     // 오류 발생 시, 콘솔에 오류 메시지를 출력하고 null을 반환합니다.
-    print('Error fetching address: $e');
+    printd('Error fetching address: $e');
     return null;
   }
 }

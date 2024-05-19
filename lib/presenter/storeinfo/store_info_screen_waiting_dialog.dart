@@ -1,7 +1,10 @@
 import 'package:animated_flip_counter/animated_flip_counter.dart';
 import 'package:flutter/material.dart';
+import 'package:orre_web/services/debug.services.dart';
 import 'package:flutter/services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:orre_web/services/debug.services.dart';
 import 'package:orre_web/provider/network/websocket/store_waiting_usercall_list_state_notifier.dart';
 import 'package:orre_web/provider/userinfo/user_info_state_notifier.dart';
 import 'package:orre_web/widget/popup/alert_popup_widget.dart';
@@ -116,10 +119,10 @@ class WaitingDialog extends ConsumerWidget {
             if (formKey.currentState!.validate()) {
               // 여기에서 입력된 정보를 처리합니다.
               // 예를 들어, 웨이팅 요청을 서버에 보내는 로직을 구현할 수 있습니다.
-              print("전화번호: ${phoneNumberController.text}");
-              print("인원 수: ${numberOfPersonControlloer}");
-              print("가게 코드: $storeCode");
-              print("웨이팅 시작");
+              printd("전화번호: ${phoneNumberController.text}");
+              printd("인원 수: ${numberOfPersonControlloer}");
+              printd("가게 코드: $storeCode");
+              printd("웨이팅 시작");
               subscribeAndShowDialog(
                   context,
                   storeCode,
@@ -137,7 +140,7 @@ class WaitingDialog extends ConsumerWidget {
   void subscribeAndShowDialog(BuildContext context, int storeCode,
       String phoneNumber, String numberOfPersons, WidgetRef ref) {
     // 스트림 구독
-    print("subscribeAndShowDialog");
+    printd("subscribeAndShowDialog");
     final stream =
         ref.watch(storeWaitingRequestNotifierProvider.notifier).startSubscribe(
               storeCode,
@@ -150,10 +153,10 @@ class WaitingDialog extends ConsumerWidget {
           int.parse(numberOfPersons),
         );
 
-    print("stream: $stream");
+    printd("stream: $stream");
     // 스트림의 각 결과에 대해 다른 대화 상자를 표시
     stream.then((result) {
-      print("result: $result");
+      printd("result: $result");
       if (result) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           final myWaitingInfo = ref.read(storeWaitingRequestNotifierProvider);
@@ -184,7 +187,7 @@ class WaitingDialog extends ConsumerWidget {
       }
     }, onError: (error) {
       // 스트림에서 에러 발생 시 처리
-      print("waiting error: ${error}");
+      printd("waiting error: ${error}");
       showDialog(
         context: context,
         builder: (context) => AlertPopupWidget(

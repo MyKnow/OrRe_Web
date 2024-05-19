@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:orre_web/provider/network/connectivity_state_notifier.dart';
 import 'package:orre_web/provider/network/websocket/stomp_client_state_notifier.dart';
@@ -17,8 +18,8 @@ class NetworkErrorScreen extends ConsumerWidget {
               onPressed: () {
                 ref.read(networkStateProvider).listen((event) {
                   if (event) {
-                    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-                      ref.refresh(stompClientStateNotifierProvider.notifier);
+                    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                      ref.invalidate(stompClientStateNotifierProvider);
                     });
                   }
                 });

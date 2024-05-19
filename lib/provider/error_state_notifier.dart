@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:orre_web/services/debug.services.dart';
+import 'package:orre_web/services/debug.services.dart';
 
 enum Error {
   none,
@@ -18,12 +20,12 @@ class ErrorStateNotifier extends StateNotifier<List<Error>> {
   ErrorStateNotifier() : super([]);
 
   void addError(Error error) {
-    print("addError : $error");
+    printd("addError : $error");
     state = [...state, error];
   }
 
   void deleteError(Error error) {
-    print("deleteError : $error");
+    printd("deleteError : $error");
 
     if (state.isEmpty) {
       return;

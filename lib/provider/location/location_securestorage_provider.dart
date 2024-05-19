@@ -1,5 +1,7 @@
 import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:orre_web/services/debug.services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:orre_web/provider/network/websocket/store_waiting_info_list_state_notifier.dart';
 
@@ -26,17 +28,17 @@ class LocationListNotifier extends StateNotifier<LocationState> {
       if (userLocationInfo != null) {
         updateNowLocation(userLocationInfo);
       } else {
-        print("Error fetching now location");
+        printd("Error fetching now location");
       }
     }).catchError((error) {
       // 오류 처리
-      print("Error fetching now location: $error");
+      printd("Error fetching now location: $error");
     });
   }
 
   // 새로운 위치를 리스트에 추가
   Future<void> addLocation(LocationInfo locationInfo) async {
-    print("addLocation");
+    printd("addLocation");
 
     final updatedLocations = List<LocationInfo>.from(state.customLocations)
       ..add(locationInfo);
@@ -46,7 +48,7 @@ class LocationListNotifier extends StateNotifier<LocationState> {
 
   // 지정된 이름의 위치 정보 제거
   Future<void> removeLocation(String locationName) async {
-    print("removeLocation");
+    printd("removeLocation");
     List<LocationInfo> updatedLocations = state.customLocations
         .where((location) => location.locationName != locationName)
         .toList();
@@ -71,7 +73,7 @@ class LocationListNotifier extends StateNotifier<LocationState> {
 
   // 위치 정보 리스트를 안전한 저장소에 저장
   Future<void> saveLocations() async {
-    print("saveLocations");
+    printd("saveLocations");
     List<String> stringList = state.customLocations
         .map((location) => json.encode(location.toJson()))
         .toList();
@@ -80,7 +82,7 @@ class LocationListNotifier extends StateNotifier<LocationState> {
 
   // 저장소에서 위치 정보 리스트 로드
   Future<void> loadLocations() async {
-    print("loadLocations");
+    printd("loadLocations");
     String? stringListJson = await _storage.read(key: 'savedLocations');
     List<LocationInfo> loadedLocations = [];
     LocationInfo? initialSelectedLocation;
@@ -102,7 +104,7 @@ class LocationListNotifier extends StateNotifier<LocationState> {
 
   // "nowLocation"을 현재 위치 정보로 업데이트하는 메서드
   Future<void> updateNowLocation(LocationInfo newLocation) async {
-    print("updateNowLocation " + newLocation.locationName);
+    printd("updateNowLocation " + newLocation.locationName);
     // "nowLocation"을 찾습니다.
     int index = state.customLocations
         .indexWhere((loc) => loc.locationName == "nowLocation");
@@ -120,7 +122,7 @@ class LocationListNotifier extends StateNotifier<LocationState> {
     // 상태를 업데이트합니다.
     state = state.copyWith(
         customLocations: updatedLocations, nowLocation: newLocation);
-    print("locationListProvider : ${state.selectedLocation?.locationName}");
+    printd("locationListProvider : ${state.selectedLocation?.locationName}");
     selectLocation(newLocation);
     // 변경된 위치 정보를 저장합니다.
     saveLocations();
@@ -129,8 +131,8 @@ class LocationListNotifier extends StateNotifier<LocationState> {
   // 선택된 위치를 업데이트하는 메서드
   void selectLocation(LocationInfo location) {
     ref.read(storeWaitingInfoListNotifierProvider.notifier).unSubscribeAll();
-    print("selectLocation");
-    print(location.locationName);
+    printd("selectLocation");
+    printd(location.locationName);
     state = state.copyWith(selectedLocation: location);
   }
 }

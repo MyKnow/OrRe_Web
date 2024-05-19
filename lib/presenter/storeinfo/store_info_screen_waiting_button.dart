@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:orre_web/services/debug.services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:orre_web/services/debug.services.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 
 import 'store_info_screen_waiting_cancel_dialog.dart';
@@ -26,7 +29,7 @@ class WaitingButton extends ConsumerWidget {
               borderRadius: BorderRadius.circular(50),
             ),
             onPressed: () {
-              print("waitingState" + {waitingState}.toString());
+              printd("waitingState" + {waitingState}.toString());
               showDialog(
                 context: context,
                 builder: (BuildContext context) {

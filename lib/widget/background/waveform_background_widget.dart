@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:orre_web/services/debug.services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:orre_web/services/debug.services.dart';
 
 class WaveformBackgroundWidget extends ConsumerWidget {
   final Color backgroundColor;

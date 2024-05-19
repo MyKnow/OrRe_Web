@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:orre_web/services/debug.services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:orre_web/services/debug.services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_strategy/url_strategy.dart';
 
@@ -27,14 +30,14 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/',
       builder: (context, state) {
-        print("Navigating to HomePage, fullPath: ${state.fullPath}");
+        printd("Navigating to HomePage, fullPath: ${state.fullPath}");
         return HomePage();
       },
     ),
     GoRoute(
       path: '/reservation/:storeCode',
       builder: (context, state) {
-        print("Navigating to ReservationPage, fullPath: ${state.fullPath}");
+        printd("Navigating to ReservationPage, fullPath: ${state.fullPath}");
         final storeCode = int.parse(state.pathParameters['storeCode']!);
         return StoreDetailInfoWidget(null, storeCode: storeCode);
       },
@@ -42,7 +45,7 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/reservation/:storeCode/:userPhoneNumber',
       builder: (context, state) {
-        print(
+        printd(
             "Navigating to ReservationPage for Specific User, fullPath: ${state.fullPath}");
         final storeCode = int.parse(state.pathParameters['storeCode']!);
         final userPhoneNumber =
@@ -52,7 +55,7 @@ final GoRouter _router = GoRouter(
     ),
   ],
   errorBuilder: (context, state) {
-    print('Error: ${state.error}');
+    printd('Error: ${state.error}');
     return ErrorPage(state.error);
   },
 );

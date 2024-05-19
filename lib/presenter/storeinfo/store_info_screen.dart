@@ -1,6 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:orre_web/services/debug.services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:orre_web/services/debug.services.dart';
 import 'package:orre_web/presenter/storeinfo/menu/store_info_screen_menu_category_list_widget.dart';
 import 'package:orre_web/provider/network/https/get_service_log_state_notifier.dart';
 import 'package:orre_web/provider/network/websocket/stomp_client_state_notifier.dart';
@@ -54,23 +59,23 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
     super.didChangeAppLifecycleState(state);
     switch (state) {
       case AppLifecycleState.inactive:
-        print('App is inactive');
+        if (kDebugMode) print('App is inactive');
         break;
       case AppLifecycleState.paused:
-        print('App is in background');
+        if (kDebugMode) print('App is in background');
 
         // storeInfo 구독 해제
         ref.refresh(storeDetailInfoProvider.notifier).clearStoreDetailInfo();
         break;
       case AppLifecycleState.resumed:
-        print('App is in foreground');
+        if (kDebugMode) print('App is in foreground');
 
         ref
             .refresh(storeDetailInfoProvider.notifier)
             .reSubscribeStoreDetailInfo();
         break;
       case AppLifecycleState.detached:
-        print('App is detached');
+        if (kDebugMode) print('App is detached');
         break;
       case AppLifecycleState.hidden:
       // TODO: Handle this case.
@@ -83,65 +88,67 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
     final stompStatus = ref.watch(stompState);
 
     if (stomp == null) {
-      print("stomp null: $stomp");
+      if (kDebugMode) print("stomp null: $stomp");
     } else {
-      print("stomp not null: $stomp");
+      if (kDebugMode) print("stomp not null: $stomp");
 
       if (stompStatus == StompStatus.DISCONNECTED) {
-        print("stomp is not activated");
+        if (kDebugMode) print("stomp is not activated");
       } else if (stomp.isActive) {
         ref.read(storeDetailInfoProvider.notifier).setClient(stomp);
         ref.read(storeWaitingRequestNotifierProvider.notifier).setClient(stomp);
         ref
             .read(storeWaitingUserCallNotifierProvider.notifier)
             .setClient(stomp);
-        print("stomp 변경");
-        print("stomp is activated?: ${stomp.isActive}");
-        print("stomp is connected?: ${stomp.connected}");
+        if (kDebugMode) print("stomp 변경");
+        if (kDebugMode) print("stomp is activated?: ${stomp.isActive}");
+        if (kDebugMode) print("stomp is connected?: ${stomp.connected}");
         if (ref.read(storeDetailInfoProvider.notifier).isClientConnected()) {
-          print("stomp is connected");
+          if (kDebugMode) print("stomp is connected");
           return StreamBuilder(
               stream: ref
                   .watch(storeDetailInfoProvider.notifier)
                   .subscribeStoreDetailInfo(widget.storeCode),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  print("snapshot.data has data");
+                  if (kDebugMode) print("snapshot.data has data");
                   final storeDetailInfo = snapshot.data as StoreDetailInfo?;
                   if (storeDetailInfo == null) {
-                    print("storeCode: ${widget.storeCode}");
+                    if (kDebugMode) print("storeCode: ${widget.storeCode}");
                     return Scaffold(
                       body: Center(child: CustomLoadingIndicator()),
                     );
                   } else {
-                    print("storeDetailInfo not null: $storeDetailInfo");
+                    if (kDebugMode)
+                      printd("storeDetailInfo not null: $storeDetailInfo");
                     if (widget.userPhoneNumber != null) {
-                      print("userPhoneNumber is not null");
+                      if (kDebugMode) print("userPhoneNumber is not null");
                       return FutureBuilder(
                         future: ref
                             .watch(serviceLogProvider.notifier)
                             .fetchStoreServiceLog(widget.userPhoneNumber!),
                         builder: (context, snapshot) {
                           if (snapshot.data != null) {
-                            print("snapshot.data is not null");
+                            if (kDebugMode) print("snapshot.data is not null");
 
                             final userLog = snapshot.data!.userLogs;
                             if (userLog.isEmpty) {
                               // 서비스 이용 기록 없음
-                              print("userLog is empty");
+                              if (kDebugMode) print("userLog is empty");
                               return buildScaffold(
                                   context, storeDetailInfo, null);
                             } else {
                               // 서비스 이용 기록 있음
                               // 마지막 서비스 이용 기록 확인
-                              print("userLog is not empty");
-                              print(
-                                  "last userLog: ${userLog.last.status.toKr()}");
+                              if (kDebugMode) print("userLog is not empty");
+                              if (kDebugMode)
+                                printd(
+                                    "last userLog: ${userLog.last.status.toKr()}");
                               return buildScaffold(
                                   context, storeDetailInfo, userLog.last);
                             }
                           } else {
-                            print("snapshot.data is null");
+                            if (kDebugMode) print("snapshot.data is null");
                             return Scaffold(
                               body: Center(child: CustomLoadingIndicator()),
                             );
@@ -149,12 +156,12 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
                         },
                       );
                     } else {
-                      print("userPhoneNumber is null");
+                      if (kDebugMode) print("userPhoneNumber is null");
                       return buildScaffold(context, storeDetailInfo, null);
                     }
                   }
                 } else {
-                  print("snapshot.data is null");
+                  if (kDebugMode) print("snapshot.data is null");
                   ref
                       .read(storeDetailInfoProvider.notifier)
                       .sendStoreDetailInfoRequest(widget.storeCode);
@@ -164,7 +171,7 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
                 }
               });
         } else {
-          print("stomp is not connected");
+          if (kDebugMode) print("stomp is not connected");
           ref.read(storeDetailInfoProvider.notifier).setClient(stomp);
         }
       }
@@ -242,8 +249,9 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
         body: Center(child: CustomLoadingIndicator()),
       );
     } else {
-      print(
-          "storeDetailInfo waitingAvailable: ${storeDetailInfo.waitingAvailable}");
+      if (kDebugMode)
+        printd(
+            "storeDetailInfo waitingAvailable: ${storeDetailInfo.waitingAvailable}");
       return Scaffold(
         body: Container(
           color: Colors.white,

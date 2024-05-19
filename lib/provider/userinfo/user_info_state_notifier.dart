@@ -6,6 +6,7 @@ import 'package:orre_web/services/network/https_services.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:orre_web/services/debug.services.dart';
 
 final userInfoProvider =
     StateNotifierProvider<UserInfoProvider, UserInfo?>((ref) {
@@ -52,16 +53,16 @@ class UserInfoProvider extends StateNotifier<UserInfo?> {
 
   Future<String?> requestSignIn(SignInInfo? signInInfo) async {
     try {
-      print("로그인 시도 : $signInInfo");
+      printd("로그인 시도 : $signInInfo");
       SignInInfo? info;
 
       final fcmToken = await FirebaseMessaging.instance.getToken() ?? '';
-      print("fcmToken : " + fcmToken);
+      printd("fcmToken : " + fcmToken);
 
       // 매개변수가 없다면 저장된 로그인 정보를 불러옴
       if (signInInfo == null) {
         final loaded = await loadUserInfo();
-        print("loadUserInfo: $loaded");
+        printd("loadUserInfo: $loaded");
         // 저장된 정보가 있다면
         if (loaded) {
           // 해당 정보로 로그인 시도
@@ -91,15 +92,15 @@ class UserInfoProvider extends StateNotifier<UserInfo?> {
       // 로그인 요청 성공 시
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(utf8.decode(response.bodyBytes));
-        print("로그인 시도(json 200): $jsonResponse");
+        printd("로그인 시도(json 200): $jsonResponse");
         if (APIResponseStatus.success.isEqualTo(jsonResponse['status'])) {
-          print("로그인 시도: success");
+          printd("로그인 시도: success");
           // 기존 저장된 유저의 전화번호와 현재 로그인된 유저의 전화번호가 다르다면
           if (state?.phoneNumber != info.phoneNumber) {
             // 기존 유저 정보의 모든 정보 삭제
             clearAllInfo();
           }
-          print("fcmToken : " + fcmToken);
+          printd("fcmToken : " + fcmToken);
           state = UserInfo(
             phoneNumber: info.phoneNumber,
             password: info.password,
@@ -109,14 +110,14 @@ class UserInfoProvider extends StateNotifier<UserInfo?> {
           saveUserInfo();
           return jsonResponse['token'];
         } else {
-          print(
+          printd(
               "로그인 시도: failed : Status Code ${APIResponseStatusExtension.fromCode(jsonResponse['status'])}");
         }
       } else {
-        print("로그인 시도: failed : response code ${response.statusCode}");
+        printd("로그인 시도: failed : response code ${response.statusCode}");
       }
     } catch (error) {
-      print("로그인 시도: error $error");
+      printd("로그인 시도: error $error");
     }
     // 로그인 성공 못했을 시 null 반환하여 로그인 화면으로 이동
     return null;
@@ -148,7 +149,7 @@ class UserInfoProvider extends StateNotifier<UserInfo?> {
         clearUserInfo();
         return true;
       } else {
-        print(
+        printd(
             "Failed to withdrawal ${APIResponseStatusExtension.fromCode(jsonBody['status'])}");
         return false;
       }

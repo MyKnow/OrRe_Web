@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:orre_web/services/debug.services.dart';
 
 class LocationInfo {
   final String locationName; // 장소 이름
@@ -68,7 +69,7 @@ class LocationInfo {
 
       double distance = earthRadius * c * 1000; // in meters
       distance = double.parse(distance.toStringAsFixed(2));
-      print("distance: $distance");
+      printd("distance: $distance");
       return distance.toInt();
     } else {
       return -1;

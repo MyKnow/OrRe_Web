@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:orre_web/services/debug.services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:orre_web/services/debug.services.dart';
 import 'package:orre_web/model/menu_info_model.dart';
 import 'package:orre_web/presenter/storeinfo/menu/store_info_screen_menu_tilie_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
@@ -19,7 +22,7 @@ class StoreMenuListWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // print("category: $category");
     // storeDetailInfo.menuInfo.forEach((element) {
-    //   print("element: ${element.menuCode}");
+    //   printd("element: ${element.menuCode}");
     // });
     final menuList =
         MenuInfo.getMenuByCategory(storeDetailInfo.menuInfo, category);

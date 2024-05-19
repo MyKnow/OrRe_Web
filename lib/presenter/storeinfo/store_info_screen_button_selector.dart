@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:orre_web/services/debug.services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:orre_web/services/debug.services.dart';
 import 'package:orre_web/presenter/storeinfo/store_info_screen.dart';
 import 'package:orre_web/presenter/storeinfo/store_info_screen_waiting_button.dart';
 import 'package:orre_web/provider/network/websocket/store_waiting_info_request_state_notifier.dart';
@@ -23,11 +26,11 @@ class BottomButtonSelector extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final storeCode = storeDetailInfo.storeCode;
     final myWaitingInfo = ref.watch(storeWaitingRequestNotifierProvider);
-    print(
+    printd(
         "BottomButtonSelector build!!!!!!!!!!!!!!!!! ${storeDetailInfo.waitingAvailable} : $nowWaitable ");
 
     if (myWaitingInfo == null) {
-      print("myWaitingInfo is null");
+      printd("myWaitingInfo is null");
       // 현재 웨이팅 중이 아님
       if (nowWaitable) {
         return WaitingButton(storeCode: storeCode, waitingState: false);
@@ -61,11 +64,11 @@ class BottomButtonSelector extends ConsumerWidget {
       }
     } else {
       // 현재 웨이팅 중임
-      print("myWaitingInfo is not null : ${myWaitingInfo.token.storeCode}");
-      print("storeCode : $storeCode");
+      printd("myWaitingInfo is not null : ${myWaitingInfo.token.storeCode}");
+      printd("storeCode : $storeCode");
       if (myWaitingInfo.token.storeCode == storeCode) {
         // 현재 웨이팅 중인 가게임
-        print("myWaitingInfo: $myWaitingInfo");
+        printd("myWaitingInfo: $myWaitingInfo");
         return WaitingButton(storeCode: storeCode, waitingState: true);
       } else {
         // 다른 가게에서 웨이팅 중임

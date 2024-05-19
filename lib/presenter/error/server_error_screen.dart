@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 
 class ServerErrorScreen extends ConsumerWidget {
+  const ServerErrorScreen({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // final stomp = ref.watch(stompClientStateNotifierProvider);
-    return Scaffold(
+    return const Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

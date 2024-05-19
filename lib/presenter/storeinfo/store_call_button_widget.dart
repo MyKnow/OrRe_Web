@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:orre_web/services/debug.services.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -25,13 +26,13 @@ class CallButtonWidget extends StatelessWidget {
         } else {
           // 모바일 환경에서는 전화 권한 요청 및 전화 걸기
           final status = await Permission.phone.request();
-          print("status: $status");
+          printd("status: $status");
           if (status.isGranted || UniversalPlatform.isIOS) {
-            print('Permission granted');
-            print('Call the store: $storePhoneNumber');
+            printd('Permission granted');
+            printd('Call the store: $storePhoneNumber');
             await FlutterPhoneDirectCaller.callNumber(storePhoneNumber);
           } else {
-            print('Permission denied');
+            printd('Permission denied');
             Navigator.push(
               context,
               MaterialPageRoute(
