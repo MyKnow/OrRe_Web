@@ -1,18 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:orre_web/presenter/permission/permission_request_phone.dart';
 import 'package:orre_web/presenter/storeinfo/menu/store_info_screen_menu_category_list_widget.dart';
 import 'package:orre_web/provider/network/https/get_service_log_state_notifier.dart';
 import 'package:orre_web/provider/network/websocket/stomp_client_state_notifier.dart';
 import 'package:orre_web/provider/network/websocket/store_waiting_usercall_list_state_notifier.dart';
-import 'package:orre_web/widget/custom_scroll_view/csv_divider_widget.dart';
 import 'package:orre_web/widget/loading_indicator/coustom_loading_indicator.dart';
 import 'package:orre_web/widget/popup/alert_popup_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:sliver_app_bar_builder/sliver_app_bar_builder.dart';
 
 import '../../../model/store_info_model.dart';
 import '../../../provider/network/websocket/store_detail_info_state_notifier.dart';
