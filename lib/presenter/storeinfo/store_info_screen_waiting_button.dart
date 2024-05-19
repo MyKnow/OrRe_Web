@@ -56,7 +56,7 @@ class WaitingButton extends ConsumerWidget {
                       Icon(Icons.person_add),
                       SizedBox(width: 8),
                       TextWidget(
-                        '웨이팅 시작',
+                        '웨이팅 시작 / 조회',
                         color: Colors.white,
                       ),
                     ],

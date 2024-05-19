@@ -4,6 +4,7 @@ import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:orre_web/presenter/permission/permission_request_phone.dart';
 import 'package:orre_web/presenter/storeinfo/menu/store_info_screen_menu_category_list_widget.dart';
+import 'package:orre_web/provider/network/https/get_service_log_state_notifier.dart';
 import 'package:orre_web/provider/network/websocket/stomp_client_state_notifier.dart';
 import 'package:orre_web/provider/network/websocket/store_waiting_usercall_list_state_notifier.dart';
 import 'package:orre_web/widget/custom_scroll_view/csv_divider_widget.dart';
@@ -23,8 +24,13 @@ import 'store_info_screen_button_selector.dart';
 
 class StoreDetailInfoWidget extends ConsumerStatefulWidget {
   final int storeCode;
+  final String? userPhoneNumber;
 
-  StoreDetailInfoWidget({Key? key, required this.storeCode}) : super(key: key);
+  StoreDetailInfoWidget(
+    this.userPhoneNumber, {
+    Key? key,
+    required this.storeCode,
+  }) : super(key: key);
 
   @override
   _StoreDetailInfoWidgetState createState() => _StoreDetailInfoWidgetState();
@@ -90,6 +96,10 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
         print("stomp is not activated");
       } else if (stomp.isActive) {
         ref.read(storeDetailInfoProvider.notifier).setClient(stomp);
+        ref.read(storeWaitingRequestNotifierProvider.notifier).setClient(stomp);
+        ref
+            .read(storeWaitingUserCallNotifierProvider.notifier)
+            .setClient(stomp);
         print("stomp 변경");
         print("stomp is activated?: ${stomp.isActive}");
         print("stomp is connected?: ${stomp.connected}");
@@ -110,7 +120,43 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
                     );
                   } else {
                     print("storeDetailInfo not null: $storeDetailInfo");
-                    return buildScaffold(context, storeDetailInfo);
+                    if (widget.userPhoneNumber != null) {
+                      print("userPhoneNumber is not null");
+                      return FutureBuilder(
+                        future: ref
+                            .watch(serviceLogProvider.notifier)
+                            .fetchStoreServiceLog(widget.userPhoneNumber!),
+                        builder: (context, snapshot) {
+                          if (snapshot.data != null) {
+                            print("snapshot.data is not null");
+
+                            final userLog = snapshot.data!.userLogs;
+                            if (userLog.isEmpty) {
+                              // 서비스 이용 기록 없음
+                              print("userLog is empty");
+                              return buildScaffold(
+                                  context, storeDetailInfo, null);
+                            } else {
+                              // 서비스 이용 기록 있음
+                              // 마지막 서비스 이용 기록 확인
+                              print("userLog is not empty");
+                              print(
+                                  "last userLog: ${userLog.last.status.toKr()}");
+                              return buildScaffold(
+                                  context, storeDetailInfo, userLog.last);
+                            }
+                          } else {
+                            print("snapshot.data is null");
+                            return Scaffold(
+                              body: Center(child: CustomLoadingIndicator()),
+                            );
+                          }
+                        },
+                      );
+                    } else {
+                      print("userPhoneNumber is null");
+                      return buildScaffold(context, storeDetailInfo, null);
+                    }
                   }
                 } else {
                   print("snapshot.data is null");
@@ -194,8 +240,8 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
     }
   }
 
-  Widget buildScaffold(BuildContext context, StoreDetailInfo? storeDetailInfo) {
-    final myWaitingInfo = ref.watch(storeWaitingRequestNotifierProvider);
+  Widget buildScaffold(BuildContext context, StoreDetailInfo? storeDetailInfo,
+      UserLogs? userLog) {
     if (storeDetailInfo == null || storeDetailInfo.storeCode == 0) {
       return Scaffold(
         body: Center(child: CustomLoadingIndicator()),
@@ -267,6 +313,7 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
               WaitingStatusWidget(
                 storeCode: widget.storeCode,
                 locationInfo: storeDetailInfo.locationInfo,
+                userLog: userLog,
               ),
               StoreMenuCategoryListWidget(storeDetailInfo: storeDetailInfo),
               PopScope(
@@ -290,7 +337,10 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
         floatingActionButton: storeDetailInfo != StoreDetailInfo.nullValue()
             ? SizedBox(
                 child: BottomButtonSelector(
-                    nowWaitable: storeDetailInfo.waitingAvailable == 0),
+                  userLog,
+                  storeDetailInfo: storeDetailInfo,
+                  nowWaitable: storeDetailInfo.waitingAvailable == 0,
+                ),
                 width: MediaQuery.of(context).size.width * 0.95,
               )
             : null,

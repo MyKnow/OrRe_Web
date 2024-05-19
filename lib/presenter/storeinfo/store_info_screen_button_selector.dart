@@ -6,14 +6,21 @@ import 'package:orre_web/provider/network/websocket/store_waiting_info_request_s
 import 'package:orre_web/widget/popup/alert_popup_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 import '../../../provider/network/https/store_detail_info_state_notifier.dart';
+import '../../model/store_info_model.dart';
+import '../../provider/network/https/get_service_log_state_notifier.dart';
 
 class BottomButtonSelector extends ConsumerWidget {
+  final StoreDetailInfo storeDetailInfo;
   final bool nowWaitable;
-  const BottomButtonSelector({required this.nowWaitable});
+  final UserLogs? userLog;
+  const BottomButtonSelector(
+    this.userLog, {
+    required this.storeDetailInfo,
+    required this.nowWaitable,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final storeDetailInfo = ref.watch(storeDetailInfoProvider);
     final storeCode = storeDetailInfo.storeCode;
     final myWaitingInfo = ref.watch(storeWaitingRequestNotifierProvider);
     print(
@@ -55,6 +62,7 @@ class BottomButtonSelector extends ConsumerWidget {
     } else {
       // 현재 웨이팅 중임
       print("myWaitingInfo is not null : ${myWaitingInfo.token.storeCode}");
+      print("storeCode : $storeCode");
       if (myWaitingInfo.token.storeCode == storeCode) {
         // 현재 웨이팅 중인 가게임
         print("myWaitingInfo: $myWaitingInfo");
@@ -86,6 +94,7 @@ class BottomButtonSelector extends ConsumerWidget {
                             Navigator.of(context).pushReplacement(
                               MaterialPageRoute(
                                 builder: (context) => StoreDetailInfoWidget(
+                                  null,
                                   storeCode: myWaitingInfo.token.storeCode,
                                 ),
                               ),

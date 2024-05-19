@@ -11,6 +11,13 @@ class WaitingUserCallTimeListStateNotifier extends StateNotifier<Duration?> {
 
   // Sets the user call time and starts a timer to update the remaining time
   void setUserCallTime(DateTime userCallTime) {
+    if (userCallTime.isBefore(DateTime.now().toUtc())) {
+      print("유저 호출 시간이 현재 시간보다 이전입니다.");
+      deleteTimer();
+      return;
+    } else {
+      print("유저 호출 시간이 현재 시간보다 이후입니다.");
+    }
     this.userCallTime = userCallTime;
     startTimer();
   }
@@ -31,17 +38,20 @@ class WaitingUserCallTimeListStateNotifier extends StateNotifier<Duration?> {
       deleteTimer();
       return;
     }
+    final currentTime = DateTime.now().toUtc();
 
-    final currentTime = DateTime.now();
-    final difference = userCallTime!.difference(currentTime);
+    // Convert userCallTime to local time
+    final localUserCallTime = userCallTime!.toLocal();
 
-    // Debug print to check the time difference
-    print('Time difference: $difference');
+    print("유저 호출 시간 (로컬): $localUserCallTime");
+    print("현재 시간: $currentTime");
 
-    if (difference.isNegative) {
+    if (currentTime.isAfter(localUserCallTime)) {
+      print("유저 호출 시간이 지났습니다.");
       deleteTimer();
+      return;
     } else {
-      state = difference;
+      print("유저 호출 시간이 지나지 않았습니다.");
     }
   }
 

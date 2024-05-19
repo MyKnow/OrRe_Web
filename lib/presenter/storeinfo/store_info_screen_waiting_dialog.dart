@@ -38,7 +38,7 @@ class WaitingDialog extends ConsumerWidget {
         borderRadius: BorderRadius.circular(10), // 모서리를 직각으로 설정
       ),
       backgroundColor: Colors.white,
-      title: TextWidget("웨이팅 시작"),
+      title: TextWidget("웨이팅 시작 / 조회"),
       content: Form(
         key: formKey,
         child: Column(

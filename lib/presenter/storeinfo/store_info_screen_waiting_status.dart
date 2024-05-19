@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:orre_web/model/location_model.dart';
 import 'package:orre_web/model/store_waiting_info_model.dart';
 import 'package:orre_web/model/store_waiting_request_model.dart';
 import 'package:orre_web/provider/location/now_location_provider.dart';
+import 'package:orre_web/provider/network/https/get_service_log_state_notifier.dart';
 import 'package:orre_web/widget/loading_indicator/coustom_loading_indicator.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 import '../../../provider/network/websocket/store_waiting_info_list_state_notifier.dart';
@@ -16,10 +18,14 @@ import '../../provider/network/websocket/store_waiting_info_state_notifier.dart'
 class WaitingStatusWidget extends ConsumerStatefulWidget {
   final int storeCode;
   final LocationInfo locationInfo;
-  WaitingStatusWidget({required this.storeCode, required this.locationInfo}) {
-    print("WaitingStatusWidget storeCode: $storeCode");
-  }
+  final UserLogs? userLog;
+  const WaitingStatusWidget(
+      {super.key,
+      required this.storeCode,
+      required this.locationInfo,
+      required this.userLog});
   @override
+  // ignore: library_private_types_in_public_api
   _WaitingStatusWidgetState createState() => _WaitingStatusWidgetState();
 }
 
@@ -29,7 +35,13 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {});
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (widget.userLog != null) {
+        ref
+            .read(storeWaitingRequestNotifierProvider.notifier)
+            .repairStateByServiceLog(widget.userLog!);
+      }
+    });
   }
 
   @override
@@ -43,10 +55,10 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
     super.didChangeAppLifecycleState(state);
     switch (state) {
       case AppLifecycleState.inactive:
-        print('App is inactive');
+        if (kDebugMode) print('App is inactive');
         break;
       case AppLifecycleState.paused:
-        print('App is in background');
+        if (kDebugMode) print('App is in background');
 
         // storeInfo 구독 해제
         ref
@@ -54,7 +66,7 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
             .clearWaitingInfo();
         break;
       case AppLifecycleState.resumed:
-        print('App is in foreground');
+        if (kDebugMode) print('App is in foreground');
 
         ref
             .refresh(storeWaitingInfoNotifierProvider.notifier)
@@ -64,10 +76,10 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
             .reconnectByState();
         break;
       case AppLifecycleState.detached:
-        print('App is detached');
+        if (kDebugMode) print('App is detached');
         break;
       case AppLifecycleState.hidden:
-      // TODO: Handle this case.
+        break;
     }
   }
 
@@ -76,38 +88,42 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
     final stomp = ref.watch(stompClientStateNotifierProvider);
     final stompStatus = ref.watch(stompState);
     final myWaitingInfo = ref.watch(storeWaitingRequestNotifierProvider);
+    final myUserCall = ref.watch(storeWaitingUserCallNotifierProvider);
+    final remainingTime = ref.watch(waitingUserCallTimeListProvider);
+    final isWaiting = ref.watch(isWaitingNow);
 
     if (stomp == null) {
-      print("stomp null: $stomp");
+      if (kDebugMode) print("stomp null: $stomp");
     } else {
-      print("stomp not null: $stomp");
+      if (kDebugMode) print("stomp not null: $stomp");
 
       if (stompStatus == StompStatus.DISCONNECTED) {
-        print("stomp is not activated");
+        if (kDebugMode) print("stomp is not activated");
       } else if (stomp.isActive) {
         ref.read(storeWaitingInfoNotifierProvider.notifier).setClient(stomp);
         ref
             .read(storeWaitingUserCallNotifierProvider.notifier)
             .setClient(stomp);
-        print("stomp 변경");
-        print("stomp is activated?: ${stomp.isActive}");
-        print("stomp is connected?: ${stomp.connected}");
+        ref.read(storeWaitingRequestNotifierProvider.notifier).setClient(stomp);
+        if (kDebugMode) print("stomp 변경");
+        if (kDebugMode) print("stomp is activated?: ${stomp.isActive}");
+        if (kDebugMode) print("stomp is connected?: ${stomp.connected}");
         if (ref
             .read(storeWaitingInfoNotifierProvider.notifier)
             .isClientConnected()) {
-          print("stomp is connected");
+          if (kDebugMode) print("stomp is connected");
           return StreamBuilder(
               stream: ref
                   .watch(storeWaitingInfoNotifierProvider.notifier)
                   .subscribeToStoreWaitingInfo(widget.storeCode),
               builder: (context, snapshot) {
-                final myUserCall =
-                    ref.watch(storeWaitingUserCallNotifierProvider);
-                final remainingTime =
-                    ref.watch(waitingUserCallTimeListProvider);
                 if (snapshot.hasData) {
                   final waitingTeamList = snapshot.data?.enteringTeamList;
-                  print("waitingTeamList: $waitingTeamList");
+                  if (kDebugMode) print("waitingTeamList: $waitingTeamList");
+                  if (kDebugMode) print("myWaitingInfo: $myWaitingInfo");
+                  if (kDebugMode) print("myUserCall: $myUserCall");
+                  if (kDebugMode) print("remainingTime: $remainingTime");
+                  if (kDebugMode) print("isWaiting: $isWaiting");
                   return SliverToBoxAdapter(
                     child: (myWaitingInfo != null)
                         ? buildMyWaitingStatus(myWaitingInfo, snapshot.data!,
@@ -118,8 +134,8 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
                   ref
                       .read(storeWaitingInfoNotifierProvider.notifier)
                       .sendStoreCode(widget.storeCode);
-                  return SliverToBoxAdapter(
-                    child: Container(
+                  return const SliverToBoxAdapter(
+                    child: SizedBox(
                       height: 100,
                       child: Center(
                         child: CircularProgressIndicator(),
@@ -131,8 +147,8 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
         }
       }
     }
-    return SliverToBoxAdapter(
-      child: Container(
+    return const SliverToBoxAdapter(
+      child: SizedBox(
         height: 100,
         child: Center(
           child: CircularProgressIndicator(),
@@ -151,17 +167,17 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
         storeWaitingInfo.waitingTeamList.indexOf(myWaitingNumber);
 
     List<Widget> children = [
-      SizedBox(
+      const SizedBox(
         height: 10,
       ),
       Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Expanded(flex: 1, child: Icon(Icons.person)),
-          Expanded(
+          const Expanded(flex: 1, child: Icon(Icons.person)),
+          const Expanded(
               flex: 3,
               child: TextWidget(
-                '현재 대기 팀 수',
+                '남은 팀 수',
                 textAlign: TextAlign.start,
               )),
           Expanded(
@@ -176,8 +192,8 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
       Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Expanded(flex: 1, child: Icon(Icons.info_outline)),
-          Expanded(
+          const Expanded(flex: 1, child: Icon(Icons.info_outline)),
+          const Expanded(
               flex: 3,
               child: TextWidget(
                 '웨이팅 번호',
@@ -197,7 +213,7 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
       // TextWidget('내 웨이팅 전화번호: ${myWaitingInfo.token.phoneNumber}'),
       // TextWidget('남은 팀 수 : $myWaitingIndex'),
     ];
-    print("myUserCall: $myUserCall");
+    if (kDebugMode) print("myUserCall in buildMyWaitingStatus: $myUserCall");
     if (myUserCall != null &&
         remainingTime != null &&
         remainingTime.inSeconds > 0) {
@@ -205,13 +221,13 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Expanded(
+            const Expanded(
                 flex: 1,
                 child: Icon(
                   Icons.watch_later,
                   color: Color(0xFFFFB74D),
                 )),
-            Expanded(
+            const Expanded(
                 flex: 3,
                 child: TextWidget(
                   '남은 입장 시간',
@@ -223,7 +239,7 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
               child: TextWidget(
                 ': ${remainingTime.inSeconds} 초',
                 textAlign: TextAlign.start,
-                color: Color(0xFFFFB74D),
+                color: const Color(0xFFFFB74D),
               ),
             )
           ],
@@ -234,8 +250,8 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Expanded(flex: 1, child: Icon(Icons.watch_later)),
-            Expanded(
+            const Expanded(flex: 1, child: Icon(Icons.watch_later)),
+            const Expanded(
                 flex: 3,
                 child: TextWidget(
                   '예상 대기 시간',
@@ -273,14 +289,14 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
           }
           return Column(
             children: [
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Expanded(flex: 1, child: Icon(Icons.person)),
-                  Expanded(
+                  const Expanded(flex: 1, child: Icon(Icons.person)),
+                  const Expanded(
                       flex: 3,
                       child: TextWidget(
                         '현재 대기 팀 수',
@@ -298,8 +314,8 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Expanded(flex: 1, child: Icon(Icons.watch_later)),
-                  Expanded(
+                  const Expanded(flex: 1, child: Icon(Icons.watch_later)),
+                  const Expanded(
                       flex: 3,
                       child: TextWidget(
                         '예상 대기 시간',
@@ -317,8 +333,8 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Expanded(flex: 1, child: Icon(Icons.room)),
-                  Expanded(
+                  const Expanded(flex: 1, child: Icon(Icons.room)),
+                  const Expanded(
                       flex: 3,
                       child: TextWidget(
                         '나와의 거리',
@@ -327,13 +343,13 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
                   Expanded(
                     flex: 3,
                     child: TextWidget(
-                      ':  ${distance}',
+                      ':  $distance',
                       textAlign: TextAlign.start,
                     ),
                   )
                 ],
               ),
-              Divider(
+              const Divider(
                 color: Color(0xFFDFDFDF),
                 thickness: 2,
                 endIndent: 10,

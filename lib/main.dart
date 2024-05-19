@@ -36,7 +36,7 @@ final GoRouter _router = GoRouter(
       builder: (context, state) {
         print("Navigating to ReservationPage, fullPath: ${state.fullPath}");
         final storeCode = int.parse(state.pathParameters['storeCode']!);
-        return StoreDetailInfoWidget(storeCode: storeCode);
+        return StoreDetailInfoWidget(null, storeCode: storeCode);
       },
     ),
     GoRoute(
@@ -44,8 +44,10 @@ final GoRouter _router = GoRouter(
       builder: (context, state) {
         print(
             "Navigating to ReservationPage for Specific User, fullPath: ${state.fullPath}");
-        final userPhoneNumber = state.pathParameters['userPhoneNumber']!;
-        return StoreInfoScreen(storeCode: userPhoneNumber);
+        final storeCode = int.parse(state.pathParameters['storeCode']!);
+        final userPhoneNumber =
+            state.pathParameters['userPhoneNumber']!.replaceAll('-', '');
+        return StoreDetailInfoWidget(userPhoneNumber, storeCode: storeCode);
       },
     ),
   ],
@@ -103,39 +105,6 @@ class ReservationPage extends StatelessWidget {
             ),
           ],
         ));
-  }
-}
-
-class StoreInfoScreen extends StatelessWidget {
-  final String storeCode;
-
-  const StoreInfoScreen({required this.storeCode});
-
-  Future<String> fetchStoreDetails(String storeCode) async {
-    // 여기에 실제로 데이터를 가져오는 로직을 구현
-    await Future.delayed(Duration(seconds: 2)); // 예시로 2초 딜레이 추가
-    return 'Store details for store code: $storeCode';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Reservation'),
-      ),
-      body: FutureBuilder<String>(
-        future: fetchStoreDetails(storeCode),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else {
-            return Center(child: Text(snapshot.data ?? 'No details available'));
-          }
-        },
-      ),
-    );
   }
 }
 
