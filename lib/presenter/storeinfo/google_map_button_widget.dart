@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:orre_web/services/debug.services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:orre_web/services/debug.services.dart';
 import 'package:location/location.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../model/store_info_model.dart';
@@ -23,7 +23,7 @@ class LocationToggleNotifier extends StateNotifier<bool> {
 class GoogleMapButtonWidget extends ConsumerWidget {
   final StoreDetailInfo storeInfo;
 
-  const GoogleMapButtonWidget({required this.storeInfo});
+  const GoogleMapButtonWidget({super.key, required this.storeInfo});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -51,12 +51,14 @@ class GoogleMapWidget extends ConsumerStatefulWidget {
   final LatLng coordinates;
   final String storeName;
 
-  GoogleMapWidget({
+  const GoogleMapWidget({
+    super.key,
     required this.coordinates,
     required this.storeName,
   });
 
   @override
+  // ignore: library_private_types_in_public_api
   _GoogleMapWidgetState createState() => _GoogleMapWidgetState();
 }
 
@@ -137,8 +139,8 @@ class _GoogleMapWidgetState extends ConsumerState<GoogleMapWidget> {
     return Scaffold(
       appBar: AppBar(
         title: TextWidget('${widget.storeName} 위치',
-            color: Colors.white, fontSize: 32),
-        backgroundColor: Color(0xFFFFB74D),
+            color: Colors.white, fontSize: 32.sp),
+        backgroundColor: const Color(0xFFFFB74D),
         foregroundColor: Colors.white,
       ),
       body: Stack(
@@ -158,9 +160,9 @@ class _GoogleMapWidgetState extends ConsumerState<GoogleMapWidget> {
             right: 30,
             child: FloatingActionButton(
               onPressed: () => _toggleLocation(ref),
-              child: Icon(currentIcon),
-              backgroundColor: Color(0xFFFFB74D),
+              backgroundColor: const Color(0xFFFFB74D),
               foregroundColor: Colors.white,
+              child: Icon(currentIcon),
             ),
           ),
         ],

@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:orre_web/presenter/waiting/waiting_screen.dart';
 import 'package:orre_web/services/debug.services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:orre_web/widget/text/text_widget.dart';
 import 'package:url_strategy/url_strategy.dart';
 
 import 'presenter/storeinfo/store_info_screen.dart';
 
-void main() {
+Future<void> main() async {
+  await dotenv.load(fileName: ".env");
+
   WidgetsFlutterBinding.ensureInitialized();
   setPathUrlStrategy();
   runApp(const ProviderScope(child: MyApp()));
@@ -25,9 +29,20 @@ class MyApp extends StatelessWidget {
       builder: (context, _) => Builder(
         builder: (context) => MaterialApp.router(
           routerConfig: _router,
-          title: 'Reservation',
+          title: '오리',
           theme: ThemeData(
-            primarySwatch: Colors.blue,
+            primarySwatch: const MaterialColor(0xFFFFB74D, {
+              50: Color(0xFFFFB74D),
+              100: Color(0xFFFFB74D),
+              200: Color(0xFFFFB74D),
+              300: Color(0xFFFFB74D),
+              400: Color(0xFFFFB74D),
+              500: Color(0xFFFFB74D),
+              600: Color(0xFFFFB74D),
+              700: Color(0xFFFFB74D),
+              800: Color(0xFFFFB74D),
+              900: Color(0xFFFFB74D),
+            }),
           ),
         ),
       ),
@@ -41,7 +56,7 @@ final GoRouter _router = GoRouter(
       path: '/',
       builder: (context, state) {
         printd("Navigating to HomePage, fullPath: ${state.fullPath}");
-        return HomePage();
+        return const HomePage();
       },
     ),
     GoRoute(
@@ -72,11 +87,13 @@ final GoRouter _router = GoRouter(
 );
 
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Reservation'),
+          title: const TextWidget('오리'),
         ),
         body: Column(
           children: [
@@ -84,19 +101,19 @@ class HomePage extends StatelessWidget {
               onPressed: () {
                 context.go('/reservation/1');
               },
-              child: Text('Go to Store 1'),
+              child: const TextWidget('Go to Store 1'),
             ),
             ElevatedButton(
               onPressed: () {
                 context.go('/reservation/2');
               },
-              child: Text('Go to Store 2'),
+              child: const TextWidget('Go to Store 2'),
             ),
             ElevatedButton(
               onPressed: () {
                 context.go('/reservation/3');
               },
-              child: Text('Go to Store 3'),
+              child: const TextWidget('Go to Store 3'),
             ),
           ],
         ));
@@ -106,13 +123,13 @@ class HomePage extends StatelessWidget {
 class ErrorPage extends StatelessWidget {
   final Exception? error;
 
-  const ErrorPage(this.error);
+  const ErrorPage(this.error, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Error'),
+        title: const TextWidget('Error'),
       ),
       body: Center(
         child: Text(error?.toString() ?? 'Unknown error'),

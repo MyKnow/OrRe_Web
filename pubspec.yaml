@@ -1,5 +1,5 @@
 name: orre_web
-description: "A new Flutter project."
+description: "원격 웨이팅, 원격 주문"
 publish_to: 'none'
 version: 0.1.0
 
@@ -12,6 +12,7 @@ dependencies:
   firebase_messaging: ^14.9.2
   flutter:
     sdk: flutter
+  flutter_dotenv: ^5.1.0
   flutter_phone_direct_caller: ^2.1.1
   flutter_riverpod: ^2.5.1
   flutter_screenutil: ^5.9.1
@@ -51,3 +52,5 @@ flutter:
     - family: Dovemayo_gothic
       fonts :
         - asset : assets/fonts/Dovemayo_gothic.ttf
+assets:
+  - .env

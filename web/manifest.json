@@ -1,13 +1,13 @@
 {
-    "name": "orre_web",
-    "short_name": "orre_web",
-    "start_url": ".",
-    "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "name": "오리 웹",
+    "short_name": "오리",
+    "start_url": "/",
+    "display": "fullscreen",
+    "background_color": "#FFB74D",
+    "theme_color": "#FFB74D",
+    "description": "원격 웨이팅, 원격 주문",
     "orientation": "portrait-primary",
-    "prefer_related_applications": false,
+    "prefer_related_applications": true,
     "icons": [
         {
             "src": "icons/Icon-192.png",
