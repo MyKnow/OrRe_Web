@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:orre_web/presenter/qr_scanner_widget.dart';
 import 'package:orre_web/presenter/waiting/waiting_screen.dart';
 import 'package:orre_web/services/debug.services.dart';
 
@@ -12,8 +12,6 @@ import 'package:url_strategy/url_strategy.dart';
 import 'presenter/storeinfo/store_info_screen.dart';
 
 Future<void> main() async {
-  await dotenv.load(fileName: ".env");
-
   WidgetsFlutterBinding.ensureInitialized();
   setPathUrlStrategy();
   runApp(const ProviderScope(child: MyApp()));
@@ -92,31 +90,35 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const TextWidget('오리'),
-        ),
-        body: Column(
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                context.go('/reservation/1');
-              },
-              child: const TextWidget('Go to Store 1'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                context.go('/reservation/2');
-              },
-              child: const TextWidget('Go to Store 2'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                context.go('/reservation/3');
-              },
-              child: const TextWidget('Go to Store 3'),
-            ),
-          ],
-        ));
+      appBar: AppBar(
+        title: const TextWidget('오리'),
+      ),
+      body: Column(
+        children: [
+          ElevatedButton(
+            onPressed: () {
+              context.go('/reservation/1');
+            },
+            child: const TextWidget('Go to Store 1'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              context.go('/reservation/2');
+            },
+            child: const TextWidget('Go to Store 2'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              context.go('/reservation/3');
+            },
+            child: const TextWidget('Go to Store 3'),
+          ),
+        ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
+      floatingActionButton: QRScanButton(),
+      floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
+    );
   }
 }
 

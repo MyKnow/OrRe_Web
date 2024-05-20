@@ -9,6 +9,7 @@ environment:
 dependencies:
   animated_flip_counter: ^0.3.4
   cached_network_image: ^3.3.1
+  camera: ^0.10.6
   firebase_messaging: ^14.9.2
   flutter:
     sdk: flutter
@@ -23,11 +24,14 @@ dependencies:
   go_router: ^14.1.2
   google_maps_flutter: ^2.6.1
   google_maps_flutter_web: ^0.5.7
+  image_picker: ^1.1.1
   internet_connectivity_checker: ^1.0.2
   location: ^6.0.2
   nfc_manager: ^3.4.0
   permission_handler: ^11.3.1
   photo_view: ^0.15.0
+  qr_code_dart_scan: ^0.8.0
+  riverpod: ^2.5.1
   shared_preferences: ^2.2.3
   sliver_app_bar_builder: ^1.1.0
   stomp_dart_client: ^2.0.0
@@ -52,5 +56,3 @@ flutter:
     - family: Dovemayo_gothic
       fonts :
         - asset : assets/fonts/Dovemayo_gothic.ttf
-assets:
-  - .env

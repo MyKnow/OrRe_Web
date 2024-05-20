@@ -16,7 +16,7 @@ final userInfoProvider =
 class UserInfoProvider extends StateNotifier<UserInfo?> {
   UserInfoProvider() : super(null);
 
-  final _storage = FlutterSecureStorage();
+  final _storage = const FlutterSecureStorage();
 
   void updateUserInfo(UserInfo userInfo) {
     state = userInfo;
@@ -57,7 +57,7 @@ class UserInfoProvider extends StateNotifier<UserInfo?> {
       SignInInfo? info;
 
       final fcmToken = await FirebaseMessaging.instance.getToken() ?? '';
-      printd("fcmToken : " + fcmToken);
+      printd("fcmToken : $fcmToken");
 
       // 매개변수가 없다면 저장된 로그인 정보를 불러옴
       if (signInInfo == null) {
@@ -100,7 +100,7 @@ class UserInfoProvider extends StateNotifier<UserInfo?> {
             // 기존 유저 정보의 모든 정보 삭제
             clearAllInfo();
           }
-          printd("fcmToken : " + fcmToken);
+          printd("fcmToken : $fcmToken");
           state = UserInfo(
             phoneNumber: info.phoneNumber,
             password: info.password,
@@ -164,8 +164,8 @@ class UserInfoProvider extends StateNotifier<UserInfo?> {
     _storage.delete(key: 'userPassword');
     _storage.delete(key: 'name');
     _storage.delete(key: 'fcmToken');
-    _storage.readAll().then((value) => print(value));
-    _storage.read(key: 'userPhoneNumber').then((value) => print(value));
+    _storage.readAll().then((value) => printd(value));
+    _storage.read(key: 'userPhoneNumber').then((value) => printd(value));
   }
 
   void clearAllInfo() {
