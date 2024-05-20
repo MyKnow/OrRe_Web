@@ -1,9 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:orre_web/model/store_waiting_request_model.dart';
 import 'package:orre_web/presenter/storeinfo/store_info_screen_waiting_dialog.dart';
 import 'package:orre_web/presenter/waiting/waiting_screen_menu_category_list_widget.dart';
 import 'package:orre_web/provider/network/https/get_service_log_state_notifier.dart';
@@ -15,13 +14,10 @@ import 'package:orre_web/widget/button/big_button_widget.dart';
 import 'package:orre_web/widget/loading_indicator/coustom_loading_indicator.dart';
 import 'package:orre_web/widget/popup/alert_popup_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
-import 'package:orre_web/widget/text_field/text_input_widget.dart';
 
 import '../../provider/network/websocket/store_detail_info_state_notifier.dart';
 import '../../provider/network/websocket/store_waiting_info_request_state_notifier.dart';
 import '../../provider/network/websocket/store_waiting_info_state_notifier.dart';
-import '../storeinfo/menu/store_info_screen_menu_category_list_widget.dart';
-import '../storeinfo/store_info_screen.dart';
 
 class WaitingScreen extends ConsumerStatefulWidget {
   final int storeCode;
@@ -30,6 +26,7 @@ class WaitingScreen extends ConsumerStatefulWidget {
       {super.key, required this.storeCode, required this.userPhoneNumber});
 
   @override
+  // ignore: library_private_types_in_public_api
   _WaitingScreenState createState() => _WaitingScreenState();
 }
 
@@ -110,7 +107,7 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
         backgroundColor: const Color(0xFFDFDFDF),
         title: const TextWidget(' '),
         actions: const [],
-        toolbarHeight: 16,
+        toolbarHeight: 8.r,
       ),
       body: Align(
         alignment: Alignment.topCenter,
@@ -127,19 +124,19 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
-              const TextWidget(
-                '웨이팅 목록',
-                fontSize: 42,
+              SizedBox(height: 8.r),
+              TextWidget(
+                '웨이팅 조회',
+                fontSize: 32.r,
                 color: Color(0xFFFFB74D),
               ),
               Divider(
                 color: const Color(0xFFFFB74D),
-                thickness: 3,
-                endIndent: MediaQuery.of(context).size.width * 0.25,
-                indent: MediaQuery.of(context).size.width * 0.25,
+                thickness: 3.r,
+                endIndent: 0.3.sw,
+                indent: 0.3.sw,
               ),
-              const SizedBox(height: 25),
+              SizedBox(height: 8.r),
               Expanded(
                 child: FutureBuilder(
                     future: ref
@@ -148,7 +145,7 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
                     builder: (context, snapshot) {
                       printd("ServiceLog snapshot.data: ${snapshot.data}");
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(
+                        return const Center(
                           child: CustomLoadingIndicator(),
                         );
                       } else if (snapshot.hasData) {
@@ -156,7 +153,7 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
                         final userLog = storeServiceLog.userLogs.lastOrNull;
 
                         if (userLog == null) {
-                          return const TextWidget('웨이팅 중인 가게가 없습니다.');
+                          return TextWidget('웨이팅 중인 가게가 없습니다.', fontSize: 16.r);
                         }
 
                         if (userLog.status ==
@@ -165,13 +162,16 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
                                 StoreWaitingStatus.STORE_CANCELED) {
                           return Column(
                             children: [
-                              const TextWidget('현재 가게는 웨이팅이 취소되었습니다.'),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 20.r),
+                              TextWidget('현재 가게는 웨이팅이 취소되었습니다.',
+                                  fontSize: 24.r),
+                              SizedBox(height: 16.r),
                               BigButtonWidget(
                                 text: '홈으로 돌아가기',
-                                textColor: const Color(0xFF999999),
-                                backgroundColor: const Color(0xFFDFDFDF),
-                                minimumSize: const Size(double.infinity, 60),
+                                minimumSize: Size(0.5.sw, 50.r),
+                                maximumSize: Size(0.5.sw, 50.r),
+                                textColor: Colors.white,
+                                textSize: 16.r,
                                 onPressed: () {
                                   ref
                                       .read(storeDetailInfoProvider.notifier)
@@ -191,12 +191,13 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
                         });
 
                         if (userLog.storeCode != widget.storeCode) {
-                          return const TextWidget('현재 웨이팅 중인 가게가 아닙니다.');
+                          return TextWidget('현재 웨이팅 중인 가게가 아닙니다.',
+                              fontSize: 16.r);
                         } else {
                           final stomp =
                               ref.watch(stompClientStateNotifierProvider);
                           final stompStatus = ref.watch(stompState);
-                          print("stomp 재연결 로직 : ${userLog.status}");
+                          printd("stomp 재연결 로직 : ${userLog.status}");
 
                           if (stomp == null) {
                             printd("stomp null: $stomp");
@@ -237,12 +238,12 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
                               }
                             }
                           }
-                          return Center(
+                          return const Center(
                             child: CustomLoadingIndicator(),
                           );
                         }
                       } else {
-                        return const TextWidget('웨이팅 중인 가게가 없습니다.');
+                        return TextWidget('웨이팅 중인 가게가 없습니다.', fontSize: 16.r);
                       }
                     }),
               ),
@@ -277,11 +278,14 @@ class WaitingStoreItem extends ConsumerWidget {
             .sendStoreDetailInfoRequest(storeCode);
       });
       return Center(
-        child: Column(children: [
-          CustomLoadingIndicator(),
-          const SizedBox(height: 16),
-          const TextWidget('가게 정보를 불러오는 중입니다.'),
-        ]),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const CustomLoadingIndicator(),
+              SizedBox(height: 16.r),
+              TextWidget('가게 정보를 불러오는 중입니다.', fontSize: 24.r),
+            ]),
       );
     } else {
       return GestureDetector(
@@ -300,7 +304,7 @@ class WaitingStoreItem extends ConsumerWidget {
         child: Form(
           key: formKey,
           child: Container(
-            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            margin: EdgeInsets.symmetric(vertical: 8.0.r, horizontal: 24.0.r),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -311,28 +315,34 @@ class WaitingStoreItem extends ConsumerWidget {
                     CachedNetworkImage(
                       imageUrl: storeInfo.storeImageMain,
                       imageBuilder: (context, imageProvider) => Container(
-                        width: 100,
-                        height: 100,
+                        width: 80.r,
+                        height: 80.r,
                         decoration: BoxDecoration(
                           shape: BoxShape.rectangle,
                           image: DecorationImage(
                             image: imageProvider,
                             fit: BoxFit.cover,
                           ),
-                          borderRadius: BorderRadius.circular(10.0),
+                          borderRadius: BorderRadius.circular(10.0.r),
                         ),
                       ),
-                      placeholder: (context, url) => SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: Center(
-                          child: CustomLoadingIndicator(),
-                        ),
-                      ),
+                      placeholder: (context, url) {
+                        double size = 80.r;
+
+                        return SizedBox(
+                          width: size,
+                          height: size,
+                          child: Center(
+                            child: CustomLoadingImage(
+                              size: size,
+                            ),
+                          ),
+                        );
+                      },
                       errorWidget: (context, url, error) =>
                           const Icon(Icons.error),
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16.r),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -340,7 +350,7 @@ class WaitingStoreItem extends ConsumerWidget {
                         TextWidget(
                           storeInfo.storeName,
                           textAlign: TextAlign.start,
-                          fontSize: 28,
+                          fontSize: 24.r,
                         ),
 
                         // 유저 상태 및 유저 웨이팅 번호 위젯
@@ -364,25 +374,25 @@ class WaitingStoreItem extends ConsumerWidget {
                                                           .STORE_CANCELED
                                                   ? '입장 거절'
                                                   : '',
-                              fontSize: 20,
+                              fontSize: 12.r,
                               color: const Color(0xFFDD0000),
                             ),
-                            const Divider(
-                              color: Color(0xFFDD0000),
-                              thickness: 5,
-                              endIndent: 10,
-                              indent: 10,
+                            Divider(
+                              color: const Color(0xFFDD0000),
+                              thickness: 4.r,
+                              endIndent: 4.r,
+                              indent: 4.r,
                             ),
                             // 웨이팅 번호 위젯
                             Row(
                               children: [
-                                const TextWidget('내 웨이팅 번호는 ', fontSize: 20),
+                                TextWidget('내 웨이팅 번호는  ', fontSize: 12.r),
                                 TextWidget(
                                   '${userLog.waiting}',
-                                  fontSize: 24,
+                                  fontSize: 18.r,
                                   color: const Color(0xFFDD0000),
                                 ),
-                                const TextWidget('번 이예요.', fontSize: 20),
+                                TextWidget('번이예요.', fontSize: 12.r),
                               ],
                             ),
                           ],
@@ -391,7 +401,7 @@ class WaitingStoreItem extends ConsumerWidget {
                         if (userLog.status == StoreWaitingStatus.CALLED)
                           TextWidget(
                               '입장 마감까지 ${ref.watch(waitingUserCallTimeListProvider)?.inSeconds ?? "0"}초 남았습니다.',
-                              fontSize: 20)
+                              fontSize: 12.r)
                         // 대기 팀 수 위젯
                         else
                           StreamBuilder(
@@ -413,7 +423,8 @@ class WaitingStoreItem extends ConsumerWidget {
                                           .notifier)
                                       .sendStoreCode(storeInfo.storeCode);
                                 });
-                                return const TextWidget('웨이팅 정보를 불러오는 중입니다.');
+                                return TextWidget('웨이팅 정보를 불러오는 중입니다...',
+                                    fontSize: 12.r);
                               } else if (snapshot.data == null) {
                                 Future.delayed(Duration.zero, () {
                                   ref
@@ -425,7 +436,10 @@ class WaitingStoreItem extends ConsumerWidget {
                                           .notifier)
                                       .sendStoreCode(storeInfo.storeCode);
                                 });
-                                return const TextWidget('웨이팅 정보를 불러오지 못했어요.');
+                                return TextWidget(
+                                  '웨이팅 정보를 불러오지 못했어요.',
+                                  fontSize: 12.r,
+                                );
                               }
                               final storeWaitingInfo = snapshot.data;
                               final myWaitingNumber = userLog.waiting;
@@ -446,28 +460,29 @@ class WaitingStoreItem extends ConsumerWidget {
                                 final userCallTimeInSeconds =
                                     userCallTime.inSeconds.toString();
                                 return TextWidget(
-                                  '입장 마감 시간까지 ${userCallTimeInSeconds}초 남았어요.',
-                                  fontSize: 20,
-                                );
+                                    '입장 마감 시간까지 $userCallTimeInSeconds초 남았어요.',
+                                    fontSize: 12.r);
                               } else if (isMyEnteringTime == true) {
-                                return const TextWidget('입장 시간이 되었습니다.');
+                                return TextWidget('입장 시간이 되었습니다.',
+                                    fontSize: 12.r);
                               } else if (myWaitingIndex == -1 ||
                                   myWaitingIndex == null) {
-                                return const TextWidget('대기 중인 팀이 없습니다.');
+                                return TextWidget('대기 중인 팀이 없습니다.',
+                                    fontSize: 12.r);
                               } else {
                                 return Row(
                                   children: [
-                                    const TextWidget(
+                                    TextWidget(
                                       '내 순서까지  ',
-                                      fontSize: 20,
+                                      fontSize: 12.r,
                                       textAlign: TextAlign.start,
                                     ),
                                     TextWidget(
                                       '$myWaitingIndex',
-                                      fontSize: 24,
+                                      fontSize: 14,
                                       color: const Color(0xFFDD0000),
                                     ),
-                                    const TextWidget('팀 남았어요.', fontSize: 20),
+                                    TextWidget('팀 남았어요.', fontSize: 12.r),
                                   ],
                                 );
                               }
@@ -477,12 +492,12 @@ class WaitingStoreItem extends ConsumerWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.r),
                 BigButtonWidget(
                   text: '웨이팅 취소하기',
                   textColor: const Color(0xFF999999),
                   backgroundColor: const Color(0xFFDFDFDF),
-                  minimumSize: const Size(double.infinity, 40),
+                  minimumSize: Size(1.sw, 40.r),
                   onPressed: () => showDialog(
                     context: context,
                     builder: (context) => AlertPopupWidget(

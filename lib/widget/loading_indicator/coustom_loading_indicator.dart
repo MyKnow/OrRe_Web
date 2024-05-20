@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 
 class CustomLoadingIndicator extends StatelessWidget {
+  const CustomLoadingIndicator({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -9,17 +12,13 @@ class CustomLoadingIndicator extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment
             .center, // Align the column in the center vertically
         children: [
-          Image.asset(
-            'assets/images/loading_orre.gif',
-            width: MediaQuery.of(context).size.width / 2,
-            height: MediaQuery.of(context).size.width / 2,
-          ),
+          CustomLoadingImage(size: 200.r),
           SizedBox(
-            height: 20,
+            height: 16.r,
           ),
-          const TextWidget(
+          TextWidget(
             '로딩이 너무 오래 걸릴 경우 새로고침 해주세요.',
-            fontSize: 24,
+            fontSize: 16.r,
             color: Colors.black,
             fontFamily: 'Dovemayo_gothic',
             textAlign: TextAlign.center,
@@ -29,6 +28,31 @@ class CustomLoadingIndicator extends StatelessWidget {
             overflow: TextOverflow.clip,
             maxLines: 1,
           )
+        ],
+      ),
+    );
+  }
+}
+
+class CustomLoadingImage extends StatelessWidget {
+  final double size;
+  const CustomLoadingImage({
+    super.key,
+    this.size = 40,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment
+            .center, // Align the column in the center vertically
+        children: [
+          Image.asset(
+            'assets/images/loading_orre.gif',
+            width: size,
+            height: size,
+          ),
         ],
       ),
     );

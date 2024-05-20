@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:orre_web/presenter/waiting/waiting_screen.dart';
 import 'package:orre_web/services/debug.services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:orre_web/services/debug.services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_strategy/url_strategy.dart';
 
@@ -20,8 +20,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routerConfig: _router,
+    return ScreenUtilInit(
+      designSize: const Size(360, 690),
+      builder: (context, _) => Builder(
+        builder: (context) => MaterialApp.router(
+          routerConfig: _router,
+          title: 'Reservation',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+        ),
+      ),
     );
   }
 }

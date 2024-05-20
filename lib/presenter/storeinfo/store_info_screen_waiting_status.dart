@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:orre_web/services/debug.services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,12 +7,9 @@ import 'package:orre_web/model/location_model.dart';
 import 'package:orre_web/model/store_waiting_info_model.dart';
 import 'package:orre_web/model/store_waiting_request_model.dart';
 import 'package:orre_web/provider/location/now_location_provider.dart';
-import 'package:orre_web/provider/network/https/get_service_log_state_notifier.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 import '../../../provider/network/websocket/store_waiting_usercall_list_state_notifier.dart';
-import '../../../provider/waiting_usercall_time_list_state_notifier.dart';
 import '../../provider/network/websocket/stomp_client_state_notifier.dart';
-import '../../provider/network/websocket/store_waiting_info_request_state_notifier.dart';
 import '../../provider/network/websocket/store_waiting_info_state_notifier.dart';
 
 class WaitingStatusWidget extends ConsumerStatefulWidget {
@@ -277,18 +275,20 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const Expanded(flex: 1, child: Icon(Icons.person)),
-                  const Expanded(
+                  Expanded(flex: 1, child: Icon(Icons.person, size: 16.sp)),
+                  Expanded(
                       flex: 3,
                       child: TextWidget(
                         '현재 대기 팀 수',
                         textAlign: TextAlign.start,
+                        fontSize: 16.sp,
                       )),
                   Expanded(
-                    flex: 3,
+                    flex: 6,
                     child: TextWidget(
                       ':  ${storeWaitingInfo.waitingTeamList.length} 팀',
                       textAlign: TextAlign.start,
+                      fontSize: 16.sp,
                     ),
                   )
                 ],
@@ -296,18 +296,21 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const Expanded(flex: 1, child: Icon(Icons.watch_later)),
-                  const Expanded(
+                  Expanded(
+                      flex: 1, child: Icon(Icons.watch_later, size: 16.sp)),
+                  Expanded(
                       flex: 3,
                       child: TextWidget(
                         '예상 대기 시간',
                         textAlign: TextAlign.start,
+                        fontSize: 16.sp,
                       )),
                   Expanded(
-                    flex: 3,
+                    flex: 6,
                     child: TextWidget(
                       ':  ${storeWaitingInfo.waitingTeamList.length * storeWaitingInfo.estimatedWaitingTimePerTeam} 분',
                       textAlign: TextAlign.start,
+                      fontSize: 16.sp,
                     ),
                   )
                 ],
@@ -315,27 +318,29 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const Expanded(flex: 1, child: Icon(Icons.room)),
-                  const Expanded(
+                  Expanded(flex: 1, child: Icon(Icons.room, size: 16.sp)),
+                  Expanded(
                       flex: 3,
                       child: TextWidget(
                         '나와의 거리',
                         textAlign: TextAlign.start,
+                        fontSize: 16.sp,
                       )),
                   Expanded(
-                    flex: 3,
+                    flex: 6,
                     child: TextWidget(
                       ':  $distance',
                       textAlign: TextAlign.start,
+                      fontSize: 16.sp,
                     ),
                   )
                 ],
               ),
-              const Divider(
-                color: Color(0xFFDFDFDF),
-                thickness: 2,
-                endIndent: 10,
-                indent: 10,
+              Divider(
+                color: const Color(0xFFDFDFDF),
+                thickness: 2.r,
+                endIndent: 10.r,
+                indent: 10.r,
               ),
             ],
           );

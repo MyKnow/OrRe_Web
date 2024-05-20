@@ -143,7 +143,7 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
                   final storeDetailInfo = snapshot.data;
                   if (storeDetailInfo == null) {
                     printd("storeCode: ${widget.storeCode}");
-                    return Scaffold(
+                    return const Scaffold(
                       body: Center(child: CustomLoadingIndicator()),
                     );
                   } else {
@@ -155,7 +155,7 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
                   ref
                       .read(storeDetailInfoProvider.notifier)
                       .sendStoreDetailInfoRequest(widget.storeCode);
-                  return Scaffold(
+                  return const Scaffold(
                     body: Center(child: CustomLoadingIndicator()),
                   );
                 }
@@ -166,7 +166,7 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
         }
       }
     }
-    return Scaffold(
+    return const Scaffold(
       body: Center(child: CustomLoadingIndicator()),
     );
   }
@@ -175,7 +175,7 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
       UserLogs? userLog) {
     printd("\nbuildScaffold 진입");
     if (storeDetailInfo == null || storeDetailInfo.storeCode == 0) {
-      return Scaffold(
+      return const Scaffold(
         body: Center(child: CustomLoadingIndicator()),
       );
     } else {
@@ -212,10 +212,11 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
                 expandedHeight: 240, // 높이 설정
                 flexibleSpace: FlexibleSpaceBar(
                   centerTitle: true,
+                  titlePadding: const EdgeInsets.only(bottom: 12),
                   title: TextWidget(
                     storeDetailInfo.storeName,
                     color: Colors.white,
-                    fontSize: 32,
+                    fontSize: 24,
                     textAlign: TextAlign.center,
                   ),
                   background: Container(
