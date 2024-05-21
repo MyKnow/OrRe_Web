@@ -8,12 +8,14 @@ environment:
 
 dependencies:
   animated_flip_counter: ^0.3.4
+  app_settings: ^5.1.1
   cached_network_image: ^3.3.1
   camera: ^0.10.6
   firebase_messaging: ^14.9.2
   flutter:
     sdk: flutter
   flutter_dotenv: ^5.1.0
+  flutter_expandable_fab: ^2.0.0
   flutter_phone_direct_caller: ^2.1.1
   flutter_riverpod: ^2.5.1
   flutter_screenutil: ^5.9.1
@@ -30,9 +32,11 @@ dependencies:
   nfc_manager: ^3.4.0
   permission_handler: ^11.3.1
   photo_view: ^0.15.0
+  qr_bar_code_scanner_dialog: ^0.0.5
   qr_code_dart_scan: ^0.8.0
   riverpod: ^2.5.1
   shared_preferences: ^2.2.3
+  simple_barcode_scanner: ^0.1.1
   sliver_app_bar_builder: ^1.1.0
   stomp_dart_client: ^2.0.0
   universal_platform: ^1.0.0+1

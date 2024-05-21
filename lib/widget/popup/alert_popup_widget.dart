@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:orre_web/widget/button/small_button_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 
@@ -10,6 +11,7 @@ class AlertPopupWidget extends StatelessWidget {
   final bool autoPop;
   final bool cancelButton;
   final String cancelButtonText;
+  final String? multiLineText;
 
   const AlertPopupWidget({
     super.key,
@@ -20,6 +22,7 @@ class AlertPopupWidget extends StatelessWidget {
     this.autoPop = true,
     this.cancelButton = false,
     this.cancelButtonText = '취소',
+    this.multiLineText,
   });
 
   @override
@@ -34,16 +37,24 @@ class AlertPopupWidget extends StatelessWidget {
         textAlign: TextAlign.center,
         fontWeight: FontWeight.bold,
         color: const Color.fromARGB(255, 66, 49, 21),
+        fontSize: 14.sp,
       ),
-      content: (subtitle != null)
+      content: (multiLineText != null)
           ? TextWidget(
-              subtitle!,
+              multiLineText!,
               textAlign: TextAlign.center,
-              softWrap: true,
-              fontSize: 20,
               color: const Color.fromARGB(255, 66, 49, 21),
+              maxLines: 5,
+              fontSize: 14.sp,
             )
-          : null,
+          : (subtitle != null)
+              ? TextWidget(
+                  subtitle!,
+                  textAlign: TextAlign.center,
+                  color: const Color.fromARGB(255, 66, 49, 21),
+                  fontSize: 14.sp,
+                )
+              : null,
       actions: <Widget>[
         if (cancelButton)
           Container(

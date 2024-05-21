@@ -40,6 +40,7 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
     with WidgetsBindingObserver {
   @override
   void initState() {
+    printd("StoreDetailInfoWidget initState");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
@@ -50,6 +51,7 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
 
   @override
   void dispose() {
+    printd("StoreDetailInfoWidget dispose");
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

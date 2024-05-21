@@ -1,13 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:orre_web/presenter/qr_bar_code_scanner_dialog_platform_interface.dart';
+import 'package:orre_web/presenter/qr_dialog.dart';
+import 'package:qr_bar_code_scanner_dialog/qr_bar_code_scanner_dialog.dart';
 import 'package:orre_web/presenter/qr_scanner_widget.dart';
 import 'package:orre_web/presenter/waiting/waiting_screen.dart';
 import 'package:orre_web/services/debug.services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:orre_web/services/nfc_services.dart';
+import 'package:orre_web/widget/background/waveform_background_widget.dart';
+import 'package:orre_web/widget/popup/alert_popup_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
+import 'package:universal_platform/universal_platform.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:url_strategy/url_strategy.dart';
+
+import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 import 'presenter/storeinfo/store_info_screen.dart';
 
@@ -29,18 +40,9 @@ class MyApp extends StatelessWidget {
           routerConfig: _router,
           title: '오리',
           theme: ThemeData(
-            primarySwatch: const MaterialColor(0xFFFFB74D, {
-              50: Color(0xFFFFB74D),
-              100: Color(0xFFFFB74D),
-              200: Color(0xFFFFB74D),
-              300: Color(0xFFFFB74D),
-              400: Color(0xFFFFB74D),
-              500: Color(0xFFFFB74D),
-              600: Color(0xFFFFB74D),
-              700: Color(0xFFFFB74D),
-              800: Color(0xFFFFB74D),
-              900: Color(0xFFFFB74D),
-            }),
+            primaryColor: const Color(0xFFFFB74D),
+            colorScheme:
+                ColorScheme.fromSeed(seedColor: const Color(0xFFFFB74D)),
           ),
         ),
       ),
@@ -84,40 +86,157 @@ final GoRouter _router = GoRouter(
   },
 );
 
-class HomePage extends StatelessWidget {
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final _qrBarCodeScannerDialogPlugin = QrBarCodeScannerDialog();
+    String? code;
     return Scaffold(
-      appBar: AppBar(
-        title: const TextWidget('오리'),
+      body: WaveformBackgroundWidget(
+        backgroundColor: Colors.white,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: MediaQuery.of(context).size.height * 0.25),
+              TextWidget(
+                '오리',
+                fontFamily: 'Dovemayo_gothic',
+                fontSize: 48.sp,
+                color: const Color(0xFFFFB74D),
+                letterSpacing: 32.sp,
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              ClipOval(
+                child: Container(
+                  color: const Color(0xFFFFB74D),
+                  child: Image.asset(
+                    "assets/images/orre_logo.png",
+                    width: 0.3.sh,
+                    height: 0.3.sh,
+                  ),
+                ),
+              ),
+              TextWidget(
+                '원격 줄서기, 원격 주문 서비스',
+                fontFamily: 'Dovemayo_gothic',
+                fontSize: 16.sp,
+                color: const Color(0xFFFFB74D),
+              ),
+              const Spacer(),
+              const Spacer(flex: 2),
+            ],
+          ),
+        ),
       ),
-      body: Column(
+      floatingActionButtonLocation: ExpandableFab.location,
+      floatingActionButton: ExpandableFab(
+        distance: 100.0,
+        type: ExpandableFabType.side,
+        openButtonBuilder: RotateFloatingActionButtonBuilder(
+          child: const Icon(Icons.menu_open_sharp),
+          fabSize: ExpandableFabSize.large,
+          foregroundColor: Colors.white,
+          backgroundColor: const Color(0xFFFFB74D),
+          shape: const CircleBorder(),
+        ),
+        closeButtonBuilder: RotateFloatingActionButtonBuilder(
+          fabSize: ExpandableFabSize.large,
+          child: const Icon(Icons.close_fullscreen),
+          foregroundColor: Colors.white,
+          backgroundColor: const Color(0xFFFFB74D),
+          shape: const CircleBorder(),
+        ),
         children: [
-          ElevatedButton(
-            onPressed: () {
-              context.go('/reservation/1');
-            },
-            child: const TextWidget('Go to Store 1'),
+          // ElevatedButton(
+          //   onPressed: () async {
+          //     var res = await Navigator.push(
+          //         context,
+          //         MaterialPageRoute(
+          //           builder: (context) => const SimpleBarcodeScannerPage(),
+          //         ));
+          //     if (res != null) {
+          //       showDialog(
+          //         context: context,
+          //         builder: (context) => AlertPopupWidget(
+          //           title: "바코드 스캔 결과",
+          //           multiLineText: res,
+          //           buttonText: '확인',
+          //           cancelButton: false,
+          //         ),
+          //       );
+          //     }
+          //   },
+          //   child: const Text('Open Scanner'),
+          // ),
+          FloatingActionButton.large(
+            heroTag: 'qr',
+            shape: const CircleBorder(),
+            foregroundColor: Colors.white,
+            backgroundColor: const Color(0xFFFFB74D),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const QrScannerScreen()),
+            ),
+            tooltip: 'QR코드 스캔',
+            child: const Icon(Icons.qr_code_scanner_rounded),
           ),
-          ElevatedButton(
+          FloatingActionButton.large(
+            heroTag: 'nfc',
+            shape: const CircleBorder(),
+            foregroundColor: Colors.white,
+            backgroundColor: const Color(0xFFFFB74D),
             onPressed: () {
-              context.go('/reservation/2');
+              if (UniversalPlatform.isWeb) {
+                showDialog(
+                  context: context,
+                  builder: (context) => const AlertPopupWidget(
+                    title: "NFC 스캔 오류",
+                    multiLineText:
+                        "웹에서는 NFC 스캔을 지원하지 않습니다.\n바탕화면에서 바로 태그를 스캔해주세요.",
+                    buttonText: '확인',
+                    cancelButton: false,
+                  ),
+                );
+              } else {
+                startNFCScan(ref, context);
+              }
             },
-            child: const TextWidget('Go to Store 2'),
+            tooltip: 'NFC 스캔',
+            child: const Icon(Icons.nfc_rounded),
           ),
-          ElevatedButton(
+          // 오리와 계약을 원하시는 업체는 아래 버튼을 눌러주세요.
+          FloatingActionButton.large(
+            heroTag: 'contract',
+            shape: const CircleBorder(),
+            foregroundColor: Colors.white,
+            backgroundColor: const Color(0xFFFFB74D),
             onPressed: () {
-              context.go('/reservation/3');
+              showDialog(
+                context: context,
+                builder: (context) => AlertPopupWidget(
+                  title: "오리와 함께 웨이팅 서비스를 시작해보세요!",
+                  subtitle: "아래 버튼을 눌러주세요.",
+                  buttonText: '계약 방법 보기',
+                  cancelButton: true,
+                  onPressed: () {
+                    // 다른 웹페이지 링크로 이동
+                    launchUrl(Uri.parse(
+                        'https://aeioudev.notion.site/db6980c4bb4748e1a73cc9ce83b033bc?pvs=4'));
+                  },
+                ),
+              );
             },
-            child: const TextWidget('Go to Store 3'),
+            tooltip: '오리와 계약',
+            child: const Icon(Icons.business_rounded),
           ),
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
-      floatingActionButton: QRScanButton(),
-      floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
     );
   }
 }

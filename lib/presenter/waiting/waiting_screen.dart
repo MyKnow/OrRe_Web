@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:orre_web/presenter/storeinfo/google_map_button_widget.dart';
+import 'package:orre_web/presenter/storeinfo/store_call_button_widget.dart';
 import 'package:orre_web/presenter/storeinfo/store_info_screen_waiting_dialog.dart';
 import 'package:orre_web/presenter/waiting/waiting_screen_menu_category_list_widget.dart';
 import 'package:orre_web/provider/network/https/get_service_log_state_notifier.dart';
@@ -128,7 +130,7 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
               TextWidget(
                 '웨이팅 조회',
                 fontSize: 32.r,
-                color: Color(0xFFFFB74D),
+                color: const Color(0xFFFFB74D),
               ),
               Divider(
                 color: const Color(0xFFFFB74D),
@@ -176,6 +178,22 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
                                   ref
                                       .read(storeDetailInfoProvider.notifier)
                                       .clearStoreDetailInfo();
+
+                                  ref
+                                      .read(storeDetailInfoProvider.notifier)
+                                      .clearStoreDetailInfo();
+                                  ref
+                                      .read(storeWaitingRequestNotifierProvider
+                                          .notifier)
+                                      .clearWaitingRequestList();
+                                  ref
+                                      .read(storeWaitingInfoNotifierProvider
+                                          .notifier)
+                                      .clearWaitingInfo();
+                                  ref
+                                      .read(storeWaitingUserCallNotifierProvider
+                                          .notifier)
+                                      .unSubscribe();
                                   context
                                       .go('/reservation/${widget.storeCode}');
                                 },
@@ -347,10 +365,26 @@ class WaitingStoreItem extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // 가게 이름 위젯
-                        TextWidget(
-                          storeInfo.storeName,
-                          textAlign: TextAlign.start,
-                          fontSize: 24.r,
+                        Row(
+                          children: [
+                            TextWidget(
+                              storeInfo.storeName,
+                              textAlign: TextAlign.start,
+                              fontSize: 24.r,
+                            ),
+                            SizedBox(width: 8.r),
+                            // 가게 전화 버튼
+                            CallButtonWidget(
+                              storePhoneNumber: storeInfo.storePhoneNumber,
+                              iconColor: const Color(0xFFFFB74D),
+                            ),
+                            SizedBox(width: 2.r),
+                            // 구글맵 버튼
+                            GoogleMapButtonWidget(
+                              storeInfo: storeInfo,
+                              iconColor: const Color(0xFFFFB74D),
+                            ),
+                          ],
                         ),
 
                         // 유저 상태 및 유저 웨이팅 번호 위젯
@@ -389,10 +423,10 @@ class WaitingStoreItem extends ConsumerWidget {
                                 TextWidget('내 웨이팅 번호는  ', fontSize: 12.r),
                                 TextWidget(
                                   '${userLog.waiting}',
-                                  fontSize: 18.r,
+                                  fontSize: 16.r,
                                   color: const Color(0xFFDD0000),
                                 ),
-                                TextWidget('번이예요.', fontSize: 12.r),
+                                TextWidget(' 번이예요.', fontSize: 12.r),
                               ],
                             ),
                           ],
@@ -402,6 +436,8 @@ class WaitingStoreItem extends ConsumerWidget {
                           TextWidget(
                               '입장 마감까지 ${ref.watch(waitingUserCallTimeListProvider)?.inSeconds ?? "0"}초 남았습니다.',
                               fontSize: 12.r)
+                        else if (userLog.status == StoreWaitingStatus.ENTERD)
+                          TextWidget('입장이 완료되었습니다.', fontSize: 12.r)
                         // 대기 팀 수 위젯
                         else
                           StreamBuilder(
@@ -414,10 +450,6 @@ class WaitingStoreItem extends ConsumerWidget {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
                                 Future.delayed(Duration.zero, () {
-                                  ref
-                                      .read(storeWaitingInfoNotifierProvider
-                                          .notifier)
-                                      .clearWaitingInfo();
                                   ref
                                       .read(storeWaitingInfoNotifierProvider
                                           .notifier)
@@ -479,10 +511,10 @@ class WaitingStoreItem extends ConsumerWidget {
                                     ),
                                     TextWidget(
                                       '$myWaitingIndex',
-                                      fontSize: 14,
+                                      fontSize: 16.r,
                                       color: const Color(0xFFDD0000),
                                     ),
-                                    TextWidget('팀 남았어요.', fontSize: 12.r),
+                                    TextWidget(' 팀 남았어요.', fontSize: 12.r),
                                   ],
                                 );
                               }
@@ -493,32 +525,45 @@ class WaitingStoreItem extends ConsumerWidget {
                   ],
                 ),
                 SizedBox(height: 16.r),
-                BigButtonWidget(
-                  text: '웨이팅 취소하기',
-                  textColor: const Color(0xFF999999),
-                  backgroundColor: const Color(0xFFDFDFDF),
-                  minimumSize: Size(1.sw, 40.r),
-                  onPressed: () => showDialog(
-                    context: context,
-                    builder: (context) => AlertPopupWidget(
-                        title: '웨이팅 취소',
-                        subtitle: '웨이팅을 취소하시겠습니까?',
-                        onPressed: () {
-                          ref
-                              .read(
-                                  storeWaitingRequestNotifierProvider.notifier)
-                              .sendWaitingCancelRequest(
-                                  storeCode, userLog.userPhoneNumber);
-                          ref
-                              .read(storeDetailInfoProvider.notifier)
-                              .clearStoreDetailInfo();
-                          context.go('/reservation/$storeCode');
-                        },
-                        cancelButton: true,
-                        cancelButtonText: '아니요',
-                        buttonText: '네'),
+                if (userLog.status != StoreWaitingStatus.ENTERD)
+                  BigButtonWidget(
+                    text: '웨이팅 취소하기',
+                    textColor: const Color(0xFF999999),
+                    backgroundColor: const Color(0xFFDFDFDF),
+                    minimumSize: Size(1.sw, 40.r),
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (context) => AlertPopupWidget(
+                          title: '웨이팅 취소',
+                          subtitle: '웨이팅을 취소하시겠습니까?',
+                          onPressed: () {
+                            ref
+                                .read(storeWaitingRequestNotifierProvider
+                                    .notifier)
+                                .sendWaitingCancelRequest(
+                                    storeCode, userLog.userPhoneNumber);
+
+                            ref
+                                .read(storeDetailInfoProvider.notifier)
+                                .clearStoreDetailInfo();
+                            ref
+                                .read(storeWaitingRequestNotifierProvider
+                                    .notifier)
+                                .clearWaitingRequestList();
+                            ref
+                                .read(storeWaitingInfoNotifierProvider.notifier)
+                                .clearWaitingInfo();
+                            ref
+                                .read(storeWaitingUserCallNotifierProvider
+                                    .notifier)
+                                .unSubscribe();
+                            context.go('/reservation/$storeCode');
+                          },
+                          cancelButton: true,
+                          cancelButtonText: '아니요',
+                          buttonText: '네'),
+                    ),
                   ),
-                ),
                 // StoreDetailInfo의 Menu를 출력하는 Scrollview 위젯
                 Expanded(
                   child: SingleChildScrollView(

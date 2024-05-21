@@ -22,13 +22,18 @@ class LocationToggleNotifier extends StateNotifier<bool> {
 
 class GoogleMapButtonWidget extends ConsumerWidget {
   final StoreDetailInfo storeInfo;
+  final Color iconColor;
 
-  const GoogleMapButtonWidget({super.key, required this.storeInfo});
+  const GoogleMapButtonWidget({
+    super.key,
+    required this.storeInfo,
+    this.iconColor = Colors.white,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return IconButton(
-      icon: const Icon(Icons.map, color: Colors.white),
+      icon: Icon(Icons.map, color: iconColor),
       onPressed: () async {
         final LatLng coordinates = LatLng(
             storeInfo.locationInfo.latitude, storeInfo.locationInfo.longitude);

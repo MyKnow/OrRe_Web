@@ -4,10 +4,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:orre_web/presenter/storeinfo/agreement_screen.dart';
 import 'package:orre_web/provider/network/websocket/stomp_client_state_notifier.dart';
 import 'package:orre_web/provider/network/websocket/store_detail_info_state_notifier.dart';
+import 'package:orre_web/provider/network/websocket/store_waiting_info_state_notifier.dart';
 import 'package:orre_web/provider/userinfo/user_info_state_notifier.dart';
 import 'package:orre_web/services/debug.services.dart';
+import 'package:orre_web/widget/button/small_button_widget.dart';
 import 'package:orre_web/widget/popup/alert_popup_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 import 'package:orre_web/widget/text_field/text_input_widget.dart';
@@ -37,6 +40,7 @@ class WaitingDialog extends ConsumerWidget {
     final phoneNumberController = ref.watch(waitingPhoneNumberProvider);
     final numberOfPerson = ref.watch(peopleNumberProvider);
     final formKey = ref.watch(waitingFormKeyProvider);
+    final agreement = ref.watch(agreementState);
 
     return AlertDialog(
       shape: RoundedRectangleBorder(
@@ -48,7 +52,31 @@ class WaitingDialog extends ConsumerWidget {
         key: formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SmallButtonWidget(
+                    minSize: const Size(150, 50),
+                    text: '이용약관 동의하기',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AgreementScreen()),
+                      );
+                    }),
+                SizedBox(width: 16.r),
+                if (agreement == false)
+                  const Icon(Icons.cancel, color: Colors.red)
+                else
+                  const Icon(Icons.check, color: Colors.green),
+              ],
+            ),
             TextInputWidget(
               hintText: "전화번호",
               controller: phoneNumberController,
@@ -106,13 +134,15 @@ class WaitingDialog extends ConsumerWidget {
         TextButton(
           child: TextWidget("취소", fontSize: 16.sp),
           onPressed: () {
+            ref.read(agreementState.notifier).state = false;
             Navigator.of(context).pop();
           },
         ),
         TextButton(
           child: TextWidget("확인", fontSize: 16.sp),
           onPressed: () {
-            if (formKey.currentState!.validate()) {
+            if (formKey.currentState!.validate() && agreement == true) {
+              ref.read(agreementState.notifier).state = false;
               // 입력된 정보를 처리합니다.
               print("전화번호: ${phoneNumberController.text}");
               print("인원 수: $numberOfPerson");
@@ -176,6 +206,7 @@ class WaitingDialog extends ConsumerWidget {
         }
         ref.read(streamActiveProvider.notifier).state = false;
         ref.read(storeDetailInfoProvider.notifier).clearStoreDetailInfo();
+        ref.read(storeWaitingInfoNotifierProvider.notifier).clearWaitingInfo();
       });
     }
 
