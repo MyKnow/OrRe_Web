@@ -28,6 +28,7 @@ dependencies:
   google_maps_flutter_web: ^0.5.7
   image_picker: ^1.1.1
   internet_connectivity_checker: ^1.0.2
+  liquid_pull_to_refresh: ^3.0.1
   location: ^6.0.2
   nfc_manager: ^3.4.0
   permission_handler: ^11.3.1

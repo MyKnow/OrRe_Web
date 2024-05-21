@@ -530,7 +530,8 @@ class WaitingStoreItem extends ConsumerWidget {
                     text: '웨이팅 취소하기',
                     textColor: const Color(0xFF999999),
                     backgroundColor: const Color(0xFFDFDFDF),
-                    minimumSize: Size(1.sw, 40.r),
+                    minimumSize: Size(0.9.sw, 40.r),
+                    maximumSize: Size(0.9.sw, 50.r),
                     onPressed: () => showDialog(
                       context: context,
                       builder: (context) => AlertPopupWidget(

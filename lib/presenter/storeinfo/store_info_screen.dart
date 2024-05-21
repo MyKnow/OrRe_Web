@@ -20,6 +20,7 @@ import 'package:orre_web/presenter/storeinfo/store_info_screen_waiting_status.da
 import 'google_map_button_widget.dart';
 import 'store_call_button_widget.dart';
 import 'store_info_screen_button_selector.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 
 class StoreDetailInfoWidget extends ConsumerStatefulWidget {
   final int storeCode;
@@ -184,6 +185,7 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
       printd(
           "storeDetailInfo waitingAvailable: ${storeDetailInfo.waitingAvailable}");
       return Scaffold(
+        resizeToAvoidBottomInset: false,
         body: Container(
           color: Colors.white,
           child: CustomScrollView(

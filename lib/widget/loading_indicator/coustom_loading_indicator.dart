@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:orre_web/widget/button/big_button_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class CustomLoadingIndicator extends StatelessWidget {
+class CustomLoadingIndicator extends ConsumerWidget {
   const CustomLoadingIndicator({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment
@@ -27,7 +30,24 @@ class CustomLoadingIndicator extends StatelessWidget {
             padding: const EdgeInsets.all(0),
             overflow: TextOverflow.clip,
             maxLines: 1,
-          )
+          ),
+          SizedBox(
+            height: 16.r,
+          ),
+          BigButtonWidget(
+            text: "새로고침하기",
+            onPressed: () async {
+              // 현재 주소를 그대로 URL 런처로 열어서 새로고침
+              // ignore: unawaited_futures
+              final uri = Uri.base; // 현재 URL 가져오기
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri,
+                    mode: LaunchMode.inAppBrowserView); // 새로운 브라우저 창 열기
+              } else {
+                throw 'Could not launch $uri';
+              }
+            },
+          ),
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:orre_web/services/debug.services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,7 +28,7 @@ class SmallButtonWidget extends ConsumerWidget {
       },
       child: TextWidget(
         text,
-        fontSize: 20,
+        fontSize: 20.sp,
         color: Colors.white,
       ),
       style: ElevatedButton.styleFrom(
