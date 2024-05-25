@@ -43,6 +43,24 @@ class StoreMenuListWidget extends ConsumerWidget {
           ],
         ),
       );
+    } else if (category == '추천 메뉴') {
+      return ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: menuList.length,
+        itemBuilder: (context, index) {
+          final recommendMenuList =
+              MenuInfo.getRecommendedMenu(storeDetailInfo.menuInfo);
+          final menu = recommendMenuList[index];
+          return StoreMenuTileWidget(menu: menu);
+        },
+        separatorBuilder: (context, index) => Divider(
+          color: const Color(0xFFDFDFDF),
+          thickness: 2.r,
+          endIndent: 10.r,
+          indent: 10.r,
+        ),
+      );
     } else {
       return ListView.separated(
         shrinkWrap: true,

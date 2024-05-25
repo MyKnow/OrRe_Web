@@ -31,7 +31,26 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {});
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      ref
+          .read(stompClientStateNotifierProvider.notifier)
+          .connect()
+          .then((value) {
+        printd(
+            "stompClientStateNotifierProvider connect then : ${value?.connected}");
+        if (value == null) {
+          ref.read(stompClientStateNotifierProvider.notifier).connect();
+        } else {
+          ref.read(storeWaitingInfoNotifierProvider.notifier).setClient(value);
+          ref
+              .read(storeWaitingInfoNotifierProvider.notifier)
+              .subscribeToStoreWaitingInfo(widget.storeCode);
+          ref
+              .read(storeWaitingInfoNotifierProvider.notifier)
+              .sendStoreCode(widget.storeCode);
+        }
+      });
+    });
   }
 
   @override
@@ -75,62 +94,19 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
 
   @override
   Widget build(BuildContext context) {
-    printd("WaitingStatusWidget build 진입");
-    final stomp = ref.watch(stompClientStateNotifierProvider);
-    final stompStatus = ref.watch(stompState);
+    printd("\nWaitingStatusWidget 진입");
+    final storeWaitingInfo = ref.watch(storeWaitingInfoNotifierProvider);
 
-    if (stomp == null) {
-      printd("stomp null: $stomp");
+    if (storeWaitingInfo == null) {
+      return const SliverToBoxAdapter(
+          child: Center(
+        child: CircularProgressIndicator(),
+      ));
     } else {
-      printd("stomp not null: $stomp");
-
-      if (stompStatus == StompStatus.DISCONNECTED) {
-        printd("stomp is not activated");
-      } else if (stomp.isActive) {
-        ref.read(storeWaitingInfoNotifierProvider.notifier).setClient(stomp);
-        printd("stomp 변경");
-        printd("stomp is activated?: ${stomp.isActive}");
-        printd("stomp is connected?: ${stomp.connected}");
-        if (ref
-            .read(storeWaitingInfoNotifierProvider.notifier)
-            .isClientConnected()) {
-          printd("stomp is connected");
-          return StreamBuilder(
-              stream: ref
-                  .watch(storeWaitingInfoNotifierProvider.notifier)
-                  .subscribeToStoreWaitingInfo(widget.storeCode),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final waitingTeamList = snapshot.data?.enteringTeamList;
-                  printd("waitingTeamList: $waitingTeamList");
-                  return SliverToBoxAdapter(
-                    child: buildGeneralWaitingStatus(snapshot.data!, ref),
-                  );
-                } else {
-                  ref
-                      .read(storeWaitingInfoNotifierProvider.notifier)
-                      .sendStoreCode(widget.storeCode);
-                  return const SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: 100,
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                  );
-                }
-              });
-        }
-      }
+      return SliverToBoxAdapter(
+        child: buildGeneralWaitingStatus(storeWaitingInfo, ref),
+      );
     }
-    return const SliverToBoxAdapter(
-      child: SizedBox(
-        height: 100,
-        child: Center(
-          child: CircularProgressIndicator(),
-        ),
-      ),
-    );
   }
 
   Widget buildMyWaitingStatus(
@@ -138,7 +114,7 @@ class _WaitingStatusWidgetState extends ConsumerState<WaitingStatusWidget>
       StoreWaitingInfo storeWaitingInfo,
       UserCall? myUserCall,
       Duration? remainingTime) {
-    printd("buildMyWaitingStatus 진입");
+    printd("\nbuildMyWaitingStatus 진입");
     final myWaitingNumber = myWaitingInfo.token.waiting;
     final myWaitingIndex =
         storeWaitingInfo.waitingTeamList.indexOf(myWaitingNumber);

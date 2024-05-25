@@ -1,6 +1,7 @@
+import 'package:equatable/equatable.dart';
 import 'package:orre_web/services/debug.services.dart';
 
-class StoreWaitingRequest {
+class StoreWaitingRequest extends Equatable {
   final String status;
   final StoreWaitingRequestDetail token;
 
@@ -59,9 +60,12 @@ class StoreWaitingRequest {
         other.status == status &&
         other.token == token;
   }
+
+  @override
+  List<Object?> get props => [status, token];
 }
 
-class StoreWaitingRequestDetail {
+class StoreWaitingRequestDetail extends Equatable {
   final int storeCode;
   final int waiting;
   final int status;
@@ -105,4 +109,8 @@ class StoreWaitingRequestDetail {
       'personNumber': personNumber,
     };
   }
+
+  @override
+  List<Object?> get props =>
+      [storeCode, waiting, status, personNumber, phoneNumber];
 }

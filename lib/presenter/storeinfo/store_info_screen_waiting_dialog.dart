@@ -43,98 +43,96 @@ class WaitingDialog extends ConsumerWidget {
     final agreement = ref.watch(agreementState);
 
     return AlertDialog(
+      scrollable: true,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
       backgroundColor: Colors.white,
-      title: TextWidget("웨이팅 시작 / 조회", fontSize: 16.sp),
       content: Form(
         key: formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // 이용약관 위젯
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SmallButtonWidget(
-                      minSize: Size(170.r, 50.r),
-                      text: ' 이용약관 동의하기 ',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AgreementScreen()),
-                        );
-                      }),
-                  SizedBox(width: 16.r),
-                  if (agreement == false)
-                    const Icon(Icons.cancel, color: Colors.red)
-                  else
-                    const Icon(Icons.check, color: Colors.green),
-                ],
-              ),
-
-              SizedBox(height: 16.h),
-              // 인원 수 선택 위젯
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  IconButton(
-                    icon: Icon(Icons.remove,
-                        color: const Color(0xFFFFB74D), size: 16.sp),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // 이용약관 위젯
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SmallButtonWidget(
+                    minSize: Size(170.r, 50.r),
+                    text: ' 이용약관 동의하기 ',
                     onPressed: () {
-                      if (numberOfPerson > 1) {
-                        ref.read(peopleNumberProvider.notifier).state--;
-                      }
-                    },
-                  ),
-                  Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 12.r, vertical: 0.r),
-                    width: 75.r,
-                    height: 75.r,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                          color: const Color(0xFFFFB74D), width: 2.r),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: AnimatedFlipCounter(
-                      value: numberOfPerson,
-                      suffix: "명",
-                      textStyle: TextStyle(
-                          fontFamily: 'Dovemayo_gothic', fontSize: 36.r),
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.add,
-                        color: const Color(0xFFFFB74D), size: 16.sp),
-                    onPressed: () {
-                      ref.read(peopleNumberProvider.notifier).state++;
-                    },
-                  ),
-                ],
-              ),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AgreementScreen()),
+                      );
+                    }),
+                SizedBox(width: 8.r),
+                if (agreement == false)
+                  const Icon(Icons.cancel, color: Colors.red)
+                else
+                  const Icon(Icons.check, color: Colors.green),
+              ],
+            ),
 
-              // 전화번호 입력 위젯
-              TextInputWidget(
-                hintText: "전화번호",
-                controller: phoneNumberController,
-                isObscure: false,
-                type: TextInputType.phone,
-                autofillHints: [AutofillHints.telephoneNumber],
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                minLength: 11,
-                maxLength: 11,
-                ref: ref,
-              ),
-            ],
-          ),
+            SizedBox(height: 16.h),
+            // 인원 수 선택 위젯
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.remove,
+                      color: const Color(0xFFFFB74D), size: 20.sp),
+                  onPressed: () {
+                    if (numberOfPerson > 1) {
+                      ref.read(peopleNumberProvider.notifier).state--;
+                    }
+                  },
+                ),
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 12.r, vertical: 0.r),
+                  width: 48.sp,
+                  height: 48.sp,
+                  decoration: BoxDecoration(
+                    border:
+                        Border.all(color: const Color(0xFFFFB74D), width: 2.r),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: AnimatedFlipCounter(
+                    value: numberOfPerson,
+                    suffix: "명",
+                    textStyle: TextStyle(
+                        fontFamily: 'Dovemayo_gothic', fontSize: 20.sp),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.add,
+                      color: const Color(0xFFFFB74D), size: 20.sp),
+                  onPressed: () {
+                    ref.read(peopleNumberProvider.notifier).state++;
+                  },
+                ),
+              ],
+            ),
+
+            // 전화번호 입력 위젯
+            TextInputWidget(
+              hintText: "전화번호",
+              controller: phoneNumberController,
+              isObscure: false,
+              type: TextInputType.phone,
+              autofillHints: [AutofillHints.telephoneNumber],
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              minLength: 11,
+              maxLength: 11,
+              ref: ref,
+            ),
+          ],
         ),
       ),
       actions: [

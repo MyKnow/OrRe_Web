@@ -1,10 +1,12 @@
+import 'package:equatable/equatable.dart';
+
 import 'location_model.dart';
 
 import 'menu_info_model.dart';
 import 'user_info_model.dart';
 
 // 모델
-class StoreDetailInfo {
+class StoreDetailInfo extends Equatable {
   final String storeImageMain;
   final int storeCode;
   final String storeName;
@@ -177,9 +179,31 @@ class StoreDetailInfo {
     }
     return endTime;
   }
+
+  @override
+  List<Object?> get props => [
+        storeImageMain,
+        storeCode,
+        storeName,
+        storeIntroduce,
+        storeCategory,
+        storeInfoVersion,
+        waitingAvailable,
+        numberOfTeamsWaiting,
+        estimatedWaitingTime,
+        openingTime,
+        closingTime,
+        lastOrderTime,
+        breakStartTime,
+        breakEndTime,
+        storePhoneNumber,
+        locationInfo,
+        menuInfo,
+        menuCategories,
+      ];
 }
 
-class TableInfo {
+class TableInfo extends Equatable {
   final String tableCode;
   final UserSimpleInfo userSimpleInfo;
   final List<OrderedMenuList> orderedMenuList;
@@ -188,4 +212,7 @@ class TableInfo {
       {required this.tableCode,
       required this.userSimpleInfo,
       required this.orderedMenuList});
+
+  @override
+  List<Object?> get props => [tableCode, userSimpleInfo, orderedMenuList];
 }

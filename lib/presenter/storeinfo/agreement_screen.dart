@@ -105,7 +105,7 @@ class AgreementScreen extends ConsumerWidget {
                             Expanded(
                               flex: 7,
                               child: TextWidget(
-                                ': 전화번호, 위치',
+                                ': 전화번호',
                                 fontSize: 10.sp,
                                 textAlign: TextAlign.start,
                                 color: Color(0xFF999999),

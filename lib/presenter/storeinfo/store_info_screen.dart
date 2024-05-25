@@ -20,7 +20,6 @@ import 'package:orre_web/presenter/storeinfo/store_info_screen_waiting_status.da
 import 'google_map_button_widget.dart';
 import 'store_call_button_widget.dart';
 import 'store_info_screen_button_selector.dart';
-import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 
 class StoreDetailInfoWidget extends ConsumerStatefulWidget {
   final int storeCode;
@@ -46,7 +45,24 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
     WidgetsBinding.instance.addObserver(this);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(stompClientStateNotifierProvider.notifier).configureClient();
+      ref
+          .read(stompClientStateNotifierProvider.notifier)
+          .connect()
+          .then((value) {
+        printd(
+            "stompClientStateNotifierProvider connect then : ${value?.connected}");
+        if (value == null) {
+          ref.read(stompClientStateNotifierProvider.notifier).connect();
+        } else {
+          ref.read(storeDetailInfoProvider.notifier).setClient(value);
+          ref
+              .read(storeDetailInfoProvider.notifier)
+              .subscribeStoreDetailInfo(widget.storeCode);
+          ref
+              .read(storeDetailInfoProvider.notifier)
+              .sendStoreDetailInfoRequest(widget.storeCode);
+        }
+      });
     });
   }
 
@@ -88,90 +104,17 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
 
   @override
   Widget build(BuildContext context) {
-    printd("StoreDetailInfoWidget build 진입");
-    final stomp = ref.watch(stompClientStateNotifierProvider);
-    final stompStatus = ref.watch(stompState);
+    final storeDetailInfo = ref.watch(storeDetailInfoProvider);
+    final userLog = ref.watch(serviceLogProvider);
 
-    Future.delayed(Duration.zero, () {
-      final cancelDialog = ref.read(cancelDialogStatus);
-
-      if (cancelDialog != null) {
-        final cancel = cancelDialog.toString();
-        printd("cancelDialog: $cancelDialog");
-        showDialog(
-          context: context,
-          builder: (context) {
-            if (cancel == APIResponseStatus.success.toCode()) {
-              return const AlertPopupWidget(
-                title: '예약 취소',
-                subtitle: '예약이 취소되었습니다.',
-                buttonText: '확인',
-              );
-            } else {
-              return const AlertPopupWidget(
-                title: '예약 취소',
-                buttonText: '확인',
-              );
-            }
-          },
-        );
-        ref.read(cancelDialogStatus.notifier).state = null;
-      }
-    });
-
-    if (stomp == null) {
-      printd("stomp null: $stomp");
+    if (storeDetailInfo == null) {
+      return const Scaffold(
+        body: Center(child: CustomLoadingIndicator()),
+      );
     } else {
-      printd("stomp not null: $stomp");
-
-      if (stompStatus == StompStatus.DISCONNECTED) {
-        printd("stomp is not activated");
-      } else if (stomp.isActive) {
-        ref.read(storeDetailInfoProvider.notifier).setClient(stomp);
-        ref.read(storeWaitingRequestNotifierProvider.notifier).setClient(stomp);
-        printd("stomp 변경");
-        printd("stomp is activated?: ${stomp.isActive}");
-        printd("stomp is connected?: ${stomp.connected}");
-        if (ref.read(storeDetailInfoProvider.notifier).isClientConnected()) {
-          printd("stomp is connected");
-          printd("streamBuilder 실행");
-          return StreamBuilder(
-              key: UniqueKey(),
-              stream: ref
-                  .watch(storeDetailInfoProvider.notifier)
-                  .subscribeStoreDetailInfo(widget.storeCode),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  printd("snapshot.data has data");
-                  final storeDetailInfo = snapshot.data;
-                  if (storeDetailInfo == null) {
-                    printd("storeCode: ${widget.storeCode}");
-                    return const Scaffold(
-                      body: Center(child: CustomLoadingIndicator()),
-                    );
-                  } else {
-                    printd("storeDetailInfo not null: $storeDetailInfo");
-                    return buildScaffold(context, storeDetailInfo, null);
-                  }
-                } else {
-                  printd("snapshot.data is null");
-                  ref
-                      .read(storeDetailInfoProvider.notifier)
-                      .sendStoreDetailInfoRequest(widget.storeCode);
-                  return const Scaffold(
-                    body: Center(child: CustomLoadingIndicator()),
-                  );
-                }
-              });
-        } else {
-          printd("stomp is not connected");
-          ref.read(storeDetailInfoProvider.notifier).setClient(stomp);
-        }
-      }
+      return buildScaffold(
+          context, storeDetailInfo, userLog.userLogs.lastOrNull);
     }
-    return const Scaffold(
-      body: Center(child: CustomLoadingIndicator()),
-    );
   }
 
   Widget buildScaffold(BuildContext context, StoreDetailInfo? storeDetailInfo,

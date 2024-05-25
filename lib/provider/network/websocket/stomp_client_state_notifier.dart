@@ -36,9 +36,19 @@ class StompClientStateNotifier extends StateNotifier<StompClient?> {
   late StompClient client;
   StompClientStateNotifier(this.ref) : super(null);
 
-  Future<bool> connect() async {
-    configureClient();
-    return true;
+  Future<StompClient?> connect() async {
+    final Completer<StompClient?> completer = Completer();
+    if (state?.connected == true) {
+      completer.complete(state);
+    } else {
+      configureClient().listen((event) {
+        if (event == StompStatus.CONNECTED) {
+          completer.complete(state);
+        }
+      });
+    }
+
+    return completer.future;
   }
 
   Stream<StompStatus> configureClient() {
