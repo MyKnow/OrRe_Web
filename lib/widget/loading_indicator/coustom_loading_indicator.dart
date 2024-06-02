@@ -6,10 +6,12 @@ import 'package:orre_web/widget/text/text_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CustomLoadingIndicator extends ConsumerWidget {
-  const CustomLoadingIndicator({super.key});
+  String who = '';
+  CustomLoadingIndicator({super.key, required this.who});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    print("CustomLoadingIndicator build who: $who");
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment
@@ -21,6 +23,21 @@ class CustomLoadingIndicator extends ConsumerWidget {
           ),
           TextWidget(
             '로딩이 너무 오래 걸릴 경우 새로고침 해주세요.',
+            fontSize: 16.r,
+            color: Colors.black,
+            fontFamily: 'Dovemayo_gothic',
+            textAlign: TextAlign.center,
+            fontWeight: FontWeight.normal,
+            softWrap: false,
+            padding: const EdgeInsets.all(0),
+            overflow: TextOverflow.clip,
+            maxLines: 1,
+          ),
+          SizedBox(
+            height: 16.r,
+          ),
+          TextWidget(
+            '호출 : $who',
             fontSize: 16.r,
             color: Colors.black,
             fontFamily: 'Dovemayo_gothic',

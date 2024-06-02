@@ -147,8 +147,9 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
                     builder: (context, snapshot) {
                       printd("ServiceLog snapshot.data: ${snapshot.data}");
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(
-                          child: CustomLoadingIndicator(),
+                        return Center(
+                          child: CustomLoadingIndicator(
+                              who: "waiting screen service log futureBuilder"),
                         );
                       } else if (snapshot.hasData) {
                         final storeServiceLog = snapshot.data!;
@@ -256,8 +257,9 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
                               }
                             }
                           }
-                          return const Center(
-                            child: CustomLoadingIndicator(),
+                          return Center(
+                            child: CustomLoadingIndicator(
+                                who: "waiting screen builder"),
                           );
                         }
                       } else {
@@ -300,7 +302,7 @@ class WaitingStoreItem extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const CustomLoadingIndicator(),
+              CustomLoadingIndicator(who: "waiting store item build"),
               SizedBox(height: 16.r),
               TextWidget('가게 정보를 불러오는 중입니다.', fontSize: 24.r),
             ]),

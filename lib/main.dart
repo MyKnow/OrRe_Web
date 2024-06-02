@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:orre_web/presenter/qr_bar_code_scanner_dialog_platform_interface.dart';
-import 'package:orre_web/presenter/qr_dialog.dart';
+import 'package:orre_web/model/store_info_model.dart';
+import 'package:orre_web/widget/button/big_button_widget.dart';
 import 'package:qr_bar_code_scanner_dialog/qr_bar_code_scanner_dialog.dart';
 import 'package:orre_web/presenter/qr_scanner_widget.dart';
 import 'package:orre_web/presenter/waiting/waiting_screen.dart';
@@ -18,13 +19,34 @@ import 'package:universal_platform/universal_platform.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_strategy/url_strategy.dart';
 
-import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
-
 import 'presenter/storeinfo/store_info_screen.dart';
+
+class RouterObserver extends NavigatorObserver {
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    print("DidPush: $route");
+  }
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    print("DidPop: $route");
+  }
+
+  @override
+  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    print("DidRemove: $route");
+  }
+
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    print("DidReplace: $newRoute");
+  }
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setPathUrlStrategy();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -51,6 +73,8 @@ class MyApp extends StatelessWidget {
 }
 
 final GoRouter _router = GoRouter(
+  initialLocation: "/",
+  observers: [RouterObserver()],
   routes: [
     GoRoute(
       path: '/',
@@ -62,9 +86,16 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/reservation/:storeCode',
       builder: (context, state) {
+        StoreDetailInfo? info = state.extra as StoreDetailInfo?;
+
         printd("Navigating to ReservationPage, fullPath: ${state.fullPath}");
-        final storeCode = int.parse(state.pathParameters['storeCode']!);
-        return StoreDetailInfoWidget(null, storeCode: storeCode);
+        printd("Extra: $info");
+        if (info == null) {
+          final storeCode = int.parse(state.pathParameters['storeCode']!);
+          return StoreDetailInfoWidget(null, storeCode: storeCode);
+        } else {
+          return NonNullStoreDetailInfoWidget(info);
+        }
       },
     ),
     GoRoute(
@@ -128,6 +159,11 @@ class HomePage extends ConsumerWidget {
                 fontSize: 16.sp,
                 color: const Color(0xFFFFB74D),
               ),
+              BigButtonWidget(
+                  text: 'storeInfo',
+                  onPressed: () {
+                    context.go('/reservation/1');
+                  }),
               const Spacer(),
               const Spacer(flex: 2),
             ],

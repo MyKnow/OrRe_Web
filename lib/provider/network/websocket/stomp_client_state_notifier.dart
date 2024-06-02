@@ -8,7 +8,6 @@ import 'package:orre_web/provider/network/websocket/store_detail_info_state_noti
 import 'package:orre_web/provider/network/websocket/store_waiting_info_list_state_notifier.dart';
 import 'package:orre_web/provider/network/websocket/store_waiting_info_request_state_notifier.dart';
 import 'package:orre_web/provider/network/websocket/store_waiting_usercall_list_state_notifier.dart';
-import 'package:orre_web/provider/userinfo/user_info_state_notifier.dart';
 import 'package:orre_web/services/network/websocket_services.dart';
 import 'package:stomp_dart_client/stomp_dart_client.dart';
 

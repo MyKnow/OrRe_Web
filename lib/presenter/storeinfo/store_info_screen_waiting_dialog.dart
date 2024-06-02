@@ -8,7 +8,6 @@ import 'package:orre_web/presenter/storeinfo/agreement_screen.dart';
 import 'package:orre_web/provider/network/websocket/stomp_client_state_notifier.dart';
 import 'package:orre_web/provider/network/websocket/store_detail_info_state_notifier.dart';
 import 'package:orre_web/provider/network/websocket/store_waiting_info_state_notifier.dart';
-import 'package:orre_web/provider/userinfo/user_info_state_notifier.dart';
 import 'package:orre_web/services/debug.services.dart';
 import 'package:orre_web/widget/button/small_button_widget.dart';
 import 'package:orre_web/widget/popup/alert_popup_widget.dart';
@@ -23,9 +22,8 @@ final peopleNumberProvider = StateProvider<int>((ref) => 1);
 
 final waitingFormKeyProvider = Provider((ref) => GlobalKey<FormState>());
 final waitingPhoneNumberProvider = StateProvider<TextEditingController>((ref) {
-  final userInfo = ref.watch(userInfoProvider);
   final phoneNumberController = TextEditingController();
-  phoneNumberController.text = userInfo?.phoneNumber ?? "";
+  phoneNumberController.text = "";
   return phoneNumberController;
 });
 
@@ -63,6 +61,7 @@ class WaitingDialog extends ConsumerWidget {
               children: [
                 SmallButtonWidget(
                     minSize: Size(170.r, 50.r),
+                    maxSize: Size(170.r, 50.r),
                     text: ' 이용약관 동의하기 ',
                     onPressed: () {
                       Navigator.push(

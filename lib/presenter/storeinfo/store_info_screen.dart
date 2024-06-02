@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:orre_web/provider/network/websocket/store_waiting_info_request_state_notifier.dart';
 import 'package:orre_web/services/debug.services.dart';
 
@@ -9,9 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:orre_web/presenter/storeinfo/menu/store_info_screen_menu_category_list_widget.dart';
 import 'package:orre_web/provider/network/https/get_service_log_state_notifier.dart';
 import 'package:orre_web/provider/network/websocket/stomp_client_state_notifier.dart';
-import 'package:orre_web/services/network/https_services.dart';
 import 'package:orre_web/widget/loading_indicator/coustom_loading_indicator.dart';
-import 'package:orre_web/widget/popup/alert_popup_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 
 import '../../../model/store_info_model.dart';
@@ -56,6 +56,9 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
         } else {
           ref.read(storeDetailInfoProvider.notifier).setClient(value);
           ref
+              .read(storeWaitingRequestNotifierProvider.notifier)
+              .setClient(value);
+          ref
               .read(storeDetailInfoProvider.notifier)
               .subscribeStoreDetailInfo(widget.storeCode);
           ref
@@ -74,66 +77,49 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    switch (state) {
-      case AppLifecycleState.inactive:
-        printd('App is inactive');
-        break;
-      case AppLifecycleState.paused:
-        printd('App is in background');
+  Widget build(BuildContext context) {
+    printd("StoreDetailInfoWidget build");
+    final storeDetailInfo = ref.watch(storeDetailInfoProvider);
 
-        // storeInfo 구독 해제
-        ref.refresh(storeDetailInfoProvider.notifier).clearStoreDetailInfo();
-        break;
-      case AppLifecycleState.resumed:
-        printd('App is in foreground');
-
-        ref
-            .refresh(storeDetailInfoProvider.notifier)
-            .reSubscribeStoreDetailInfo();
-        break;
-      case AppLifecycleState.detached:
-        printd('App is detached');
-        break;
-      case AppLifecycleState.hidden:
-        printd('App is hidden');
-        break;
+    if (storeDetailInfo != null) {
+      context.go('/reservation/${widget.storeCode}', extra: storeDetailInfo);
     }
+
+    return Scaffold(
+        body: Center(
+            child: CustomLoadingIndicator(
+                who: "StoreDetailInfoWidget buildScaffold")));
   }
+}
+
+class NonNullStoreDetailInfoWidget extends ConsumerStatefulWidget {
+  final StoreDetailInfo storeDetailInfo;
+
+  const NonNullStoreDetailInfoWidget(
+    this.storeDetailInfo, {
+    super.key,
+  });
 
   @override
+  // ignore: library_private_types_in_public_api
+  _NonNullStoreDetailInfoWidgetState createState() =>
+      _NonNullStoreDetailInfoWidgetState();
+}
+
+class _NonNullStoreDetailInfoWidgetState
+    extends ConsumerState<NonNullStoreDetailInfoWidget> {
+  @override
   Widget build(BuildContext context) {
-    final storeDetailInfo = ref.watch(storeDetailInfoProvider);
-    final userLog = ref.watch(serviceLogProvider);
-
-    if (storeDetailInfo == null) {
-      return const Scaffold(
-        body: Center(child: CustomLoadingIndicator()),
-      );
-    } else {
-      return buildScaffold(
-          context, storeDetailInfo, userLog.userLogs.lastOrNull);
-    }
-  }
-
-  Widget buildScaffold(BuildContext context, StoreDetailInfo? storeDetailInfo,
-      UserLogs? userLog) {
-    printd("\nbuildScaffold 진입");
-    if (storeDetailInfo == null || storeDetailInfo.storeCode == 0) {
-      return const Scaffold(
-        body: Center(child: CustomLoadingIndicator()),
-      );
-    } else {
-      printd(
-          "storeDetailInfo waitingAvailable: ${storeDetailInfo.waitingAvailable}");
-      return Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: Container(
-          color: Colors.white,
-          child: CustomScrollView(
-            slivers: [
-              SliverAppBar(
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      body: Container(
+        color: Colors.white,
+        child: CustomScrollView(
+          slivers: [
+            Consumer(
+                // Consumer로 감싸서 widget.storeDetailInfoProvider를 감지하고, widget.storeDetailInfo가 변경될 때마다 화면을 갱신
+                builder: (context, ref, child) {
+              return SliverAppBar(
                 backgroundColor: const Color(0xFFFFB74D), // 배경색 설정
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
@@ -141,6 +127,22 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
                     bottomRight: Radius.circular(25),
                   ),
                 ),
+                leading: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    ClipOval(
+                      child: Image.asset(
+                        "assets/images/orre_logo.png",
+                        width: 16.sp,
+                        height: 16.sp,
+                      ),
+                    ),
+                    SizedBox(width: 5.sp),
+                    TextWidget("오리", color: Colors.white, fontSize: 14.sp),
+                  ],
+                ),
+                leadingWidth: 60.sp,
                 // leading: IconButton(
                 //   // 왼쪽 상단 뒤로가기 아이콘
                 //   icon: Icon(Icons.arrow_back, color: Colors.white),
@@ -150,10 +152,10 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
                 // ),
                 actions: [
                   CallButtonWidget(
-                    storePhoneNumber: storeDetailInfo.storePhoneNumber,
+                    storePhoneNumber: widget.storeDetailInfo.storePhoneNumber,
                   ),
                   GoogleMapButtonWidget(
-                    storeInfo: storeDetailInfo,
+                    storeInfo: widget.storeDetailInfo,
                   ),
                 ],
                 expandedHeight: 240, // 높이 설정
@@ -161,7 +163,7 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
                   centerTitle: true,
                   titlePadding: const EdgeInsets.only(bottom: 12),
                   title: TextWidget(
-                    storeDetailInfo.storeName,
+                    widget.storeDetailInfo.storeName,
                     color: Colors.white,
                     fontSize: 24,
                     textAlign: TextAlign.center,
@@ -178,7 +180,7 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
                       borderRadius: BorderRadius.circular(50),
                       child: Image(
                         image: CachedNetworkImageProvider(
-                            storeDetailInfo.storeImageMain),
+                            widget.storeDetailInfo.storeImageMain),
                         fit: BoxFit.cover,
                         width: 130,
                         height: 130,
@@ -189,40 +191,75 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
                 pinned: true, // 스크롤시 고정
                 floating: true, // 스크롤 올릴 때 축소될지 여부
                 snap: true, // 스크롤을 빨리 움직일 때 자동으로 확장/축소될지 여부
-              ),
-              WaitingStatusWidget(
-                storeCode: widget.storeCode,
-                locationInfo: storeDetailInfo.locationInfo,
-              ),
-              StoreMenuCategoryListWidget(storeDetailInfo: storeDetailInfo),
-              PopScope(
-                child: const SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: 80,
-                  ),
+              );
+            }),
+            Consumer(
+                // Consumer로 감싸서 widget.storeDetailInfoProvider를 감지하고, widget.storeDetailInfo가 변경될 때마다 화면을 갱신
+                builder: (context, ref, child) {
+              return WaitingStatusWidget(
+                storeCode: widget.storeDetailInfo.storeCode,
+                locationInfo: widget.storeDetailInfo.locationInfo,
+              );
+            }),
+
+            Consumer(
+                // Consumer로 감싸서 widget.storeDetailInfoProvider를 감지하고, widget.storeDetailInfo가 변경될 때마다 화면을 갱신
+                builder: (context, ref, child) {
+              return StoreMenuCategoryListWidget(
+                  storeDetailInfo: widget.storeDetailInfo);
+            }),
+            // 사업자 정보 Footer
+            SliverToBoxAdapter(
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextWidget(
+                      "단모음데브 대표 정민호 | ",
+                      fontSize: 6.sp,
+                      color: Colors.grey,
+                    ),
+                    TextWidget("주소 : 경기도 용인시 기흥구 보정동 1189-3, 3층 일부 | ",
+                        fontSize: 6.sp, color: Colors.grey),
+                    TextWidget(
+                      "사업자 등록번호 865-18-02259",
+                      fontSize: 6.sp,
+                      color: Colors.grey,
+                    ),
+                  ],
                 ),
-                onPopInvoked: (didPop) {
-                  if (didPop) {
-                    ref
-                        .read(storeDetailInfoProvider.notifier)
-                        .clearStoreDetailInfo();
-                  }
-                },
               ),
-            ],
-          ),
+            ),
+            PopScope(
+              child: const SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 80,
+                ),
+              ),
+              onPopInvoked: (didPop) {
+                if (didPop) {
+                  ref
+                      .read(storeDetailInfoProvider.notifier)
+                      .clearStoreDetailInfo();
+                }
+              },
+            ),
+          ],
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: storeDetailInfo != StoreDetailInfo.nullValue()
-            ? SizedBox(
-                width: MediaQuery.of(context).size.width * 0.95,
-                child: BottomButtonSelector(
-                  storeDetailInfo: storeDetailInfo,
-                  nowWaitable: storeDetailInfo.waitingAvailable == 0,
-                ),
-              )
-            : null,
-      );
-    }
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton:
+          widget.storeDetailInfo != StoreDetailInfo.nullValue()
+              ? SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.95,
+                  child: BottomButtonSelector(
+                    storeDetailInfo: widget.storeDetailInfo,
+                    nowWaitable: widget.storeDetailInfo.waitingAvailable == 0,
+                  ),
+                )
+              : null,
+    );
   }
 }

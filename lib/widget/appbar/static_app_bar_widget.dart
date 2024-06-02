@@ -9,16 +9,16 @@ class StaticAppBarWidget extends ConsumerWidget {
   final List<Widget>? actions;
 
   const StaticAppBarWidget({
-    Key? key,
+    super.key,
     required this.title,
     this.leading,
     this.actions,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
-      padding: EdgeInsets.only(top: 40, left: 5),
+      padding: const EdgeInsets.only(top: 40, left: 5),
       child: Row(
         children: [
           leading ?? SizedBox(width: 20),
