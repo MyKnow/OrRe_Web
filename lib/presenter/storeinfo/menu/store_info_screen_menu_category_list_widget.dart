@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:orre_web/presenter/storeinfo/menu/store_info_screen_menu_category_tile_widget.dart';
+import 'package:orre_web/services/debug.services.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 
 import '../../../../model/store_info_model.dart';
@@ -14,8 +15,10 @@ class StoreMenuCategoryListWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    printd("StoreMenuCategoryListWidget build");
     final menuCategories = storeDetailInfo.menuCategories;
     final categoryKR = menuCategories.getCategories();
+    printd("categoryKR: ${categoryKR.length}");
 
     if (categoryKR.length < 2) {
       return SliverToBoxAdapter(
@@ -42,8 +45,13 @@ class StoreMenuCategoryListWidget extends ConsumerWidget {
         ),
       );
     } else {
-      return SliverToBoxAdapter(
-        child: StoreMenuCategoryTileWidget(storeDetailInfo: storeDetailInfo),
+      return Consumer(
+        builder: (context, ref, child) {
+          return SliverToBoxAdapter(
+            child: StoreMenuCategoryTileWidget(
+                storeDetailInfo: storeDetailInfo, categoryKR: categoryKR),
+          );
+        },
       );
     }
   }

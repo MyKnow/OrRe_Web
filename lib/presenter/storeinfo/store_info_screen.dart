@@ -11,8 +11,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:orre_web/presenter/storeinfo/menu/store_info_screen_menu_category_list_widget.dart';
 import 'package:orre_web/provider/network/https/get_service_log_state_notifier.dart';
 import 'package:orre_web/provider/network/websocket/stomp_client_state_notifier.dart';
+import 'package:orre_web/widget/button/small_button_widget.dart';
 import 'package:orre_web/widget/loading_indicator/coustom_loading_indicator.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../model/store_info_model.dart';
 import '../../../provider/network/websocket/store_detail_info_state_notifier.dart';
@@ -82,13 +84,15 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
     final storeDetailInfo = ref.watch(storeDetailInfoProvider);
 
     if (storeDetailInfo != null) {
-      context.go('/reservation/${widget.storeCode}', extra: storeDetailInfo);
+      return NonNullStoreDetailInfoWidget(storeDetailInfo);
+      // return TextWidget(
+      //     "storeDetailInfo is not null : ${storeDetailInfo.storeCode}");
+    } else {
+      return Scaffold(
+        body:
+            CustomLoadingIndicator(who: "StoreDetailInfoWidget buildScaffold"),
+      );
     }
-
-    return Scaffold(
-        body: Center(
-            child: CustomLoadingIndicator(
-                who: "StoreDetailInfoWidget buildScaffold")));
   }
 }
 
@@ -116,6 +120,7 @@ class _NonNullStoreDetailInfoWidgetState
         color: Colors.white,
         child: CustomScrollView(
           slivers: [
+            // AppBar
             Consumer(
                 // Consumer로 감싸서 widget.storeDetailInfoProvider를 감지하고, widget.storeDetailInfo가 변경될 때마다 화면을 갱신
                 builder: (context, ref, child) {
@@ -189,10 +194,10 @@ class _NonNullStoreDetailInfoWidgetState
                   ),
                 ),
                 pinned: true, // 스크롤시 고정
-                floating: true, // 스크롤 올릴 때 축소될지 여부
-                snap: true, // 스크롤을 빨리 움직일 때 자동으로 확장/축소될지 여부
               );
             }),
+
+            // WaitingStatusWidget
             Consumer(
                 // Consumer로 감싸서 widget.storeDetailInfoProvider를 감지하고, widget.storeDetailInfo가 변경될 때마다 화면을 갱신
                 builder: (context, ref, child) {
@@ -202,12 +207,45 @@ class _NonNullStoreDetailInfoWidgetState
               );
             }),
 
+            SliverToBoxAdapter(
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 32.h,
+                  ),
+                  TextWidget("메뉴 사진은 앱 또는 각 항목을 클릭해서 확인 가능합니다.",
+                      fontSize: 16.sp),
+                  SizedBox(
+                    height: 8.h,
+                  ),
+                  SmallButtonWidget(
+                    text: "앱 바로가기",
+                    onPressed: () async {
+                      // 설치된 앱이 있는지 확인
+                      // final bool isInstalled =
+                      //     await canLaunchUrl("orre://store/${widget.storeDetailInfo.storeCode}");
+                      // if (await canLaunchUrl(telUri)) {
+                      //   await launchUrl(telUri);
+                      // } else {
+                      //   throw 'Could not launch $telUri';
+                      // }
+                    },
+                  ),
+                  SizedBox(
+                    height: 32.h,
+                  ),
+                ],
+              ),
+            ),
+
+            // MenuCategoryListWidget
             Consumer(
                 // Consumer로 감싸서 widget.storeDetailInfoProvider를 감지하고, widget.storeDetailInfo가 변경될 때마다 화면을 갱신
                 builder: (context, ref, child) {
               return StoreMenuCategoryListWidget(
                   storeDetailInfo: widget.storeDetailInfo);
             }),
+
             // 사업자 정보 Footer
             SliverToBoxAdapter(
               child: Container(
@@ -232,20 +270,20 @@ class _NonNullStoreDetailInfoWidgetState
                 ),
               ),
             ),
-            PopScope(
-              child: const SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 80,
-                ),
-              ),
-              onPopInvoked: (didPop) {
-                if (didPop) {
-                  ref
-                      .read(storeDetailInfoProvider.notifier)
-                      .clearStoreDetailInfo();
-                }
-              },
-            ),
+            // PopScope(
+            //   child: const SliverToBoxAdapter(
+            //     child: SizedBox(
+            //       height: 80,
+            //     ),
+            //   ),
+            //   onPopInvoked: (didPop) {
+            //     if (didPop) {
+            //       ref
+            //           .read(storeDetailInfoProvider.notifier)
+            //           .clearStoreDetailInfo();
+            //     }
+            //   },
+            // ),
           ],
         ),
       ),

@@ -39,7 +39,8 @@ class WaitingScreenStoreMenuCategoryListWidget extends ConsumerWidget {
         ),
       );
     } else {
-      return StoreMenuCategoryTileWidget(storeDetailInfo: storeDetailInfo);
+      return StoreMenuCategoryTileWidget(
+          storeDetailInfo: storeDetailInfo, categoryKR: categoryKR);
     }
   }
 }

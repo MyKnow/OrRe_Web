@@ -176,6 +176,18 @@ class WaitingDialog extends ConsumerWidget {
                   );
                 }
               });
+            } else {
+              // 이용약관 동의 여부 확인
+              if (agreement == false) {
+                showDialog(
+                  context: context,
+                  builder: (context) => const AlertPopupWidget(
+                    title: '이용약관 동의',
+                    subtitle: '이용약관에 동의해 주세요.',
+                    buttonText: '확인',
+                  ),
+                );
+              }
             }
           },
         ),

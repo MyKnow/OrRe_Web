@@ -12,6 +12,9 @@ dependencies:
   cached_network_image: ^3.3.1
   camera: ^0.10.6
   equatable: ^2.0.5
+  hive: ^2.2.3
+  path_provider: ^2.1.0
+  # fast_cached_network_image: ^1.2.9
   firebase_messaging: ^14.9.2
   flutter:
     sdk: flutter

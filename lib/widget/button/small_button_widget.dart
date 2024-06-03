@@ -11,14 +11,16 @@ class SmallButtonWidget extends ConsumerWidget {
   final Function onPressed;
   final Size minSize;
   final Size maxSize;
+  final double fontSize;
 
-  const SmallButtonWidget({
-    Key? key,
+  SmallButtonWidget({
+    super.key,
     required this.text,
     required this.onPressed,
     this.minSize = const Size(50, 50),
     this.maxSize = const Size(double.infinity, 50),
-  }) : super(key: key);
+    this.fontSize = 20,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,7 +30,7 @@ class SmallButtonWidget extends ConsumerWidget {
       },
       child: TextWidget(
         text,
-        fontSize: 20.sp,
+        fontSize: fontSize,
         color: Colors.white,
       ),
       style: ElevatedButton.styleFrom(

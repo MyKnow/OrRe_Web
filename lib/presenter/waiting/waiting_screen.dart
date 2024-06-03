@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:orre_web/presenter/storeinfo/google_map_button_widget.dart';
 import 'package:orre_web/presenter/storeinfo/store_call_button_widget.dart';
 import 'package:orre_web/presenter/storeinfo/store_info_screen_waiting_dialog.dart';
-import 'package:orre_web/presenter/waiting/waiting_screen_menu_category_list_widget.dart';
 import 'package:orre_web/provider/network/https/get_service_log_state_notifier.dart';
 import 'package:orre_web/provider/network/websocket/stomp_client_state_notifier.dart';
 import 'package:orre_web/provider/network/websocket/store_waiting_usercall_list_state_notifier.dart';
@@ -20,6 +19,8 @@ import 'package:orre_web/widget/text/text_widget.dart';
 import '../../provider/network/websocket/store_detail_info_state_notifier.dart';
 import '../../provider/network/websocket/store_waiting_info_request_state_notifier.dart';
 import '../../provider/network/websocket/store_waiting_info_state_notifier.dart';
+import '../../widget/button/small_button_widget.dart';
+import 'waiting_screen_menu_category_list_widget.dart';
 
 class WaitingScreen extends ConsumerStatefulWidget {
   final int storeCode;
@@ -332,35 +333,36 @@ class WaitingStoreItem extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     // 가게 이미지 위젯
-                    CachedNetworkImage(
-                      imageUrl: storeInfo.storeImageMain,
-                      imageBuilder: (context, imageProvider) => Container(
+                    Container(
+                      width: 80.r,
+                      height: 80.r,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(10.0.r),
+                      ),
+                      child: CachedNetworkImage(
+                        imageUrl: storeInfo.storeImageMain,
                         width: 80.r,
                         height: 80.r,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          image: DecorationImage(
-                            image: imageProvider,
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.circular(10.0.r),
-                        ),
-                      ),
-                      placeholder: (context, url) {
-                        double size = 80.r;
-
-                        return SizedBox(
-                          width: size,
-                          height: size,
-                          child: Center(
-                            child: CustomLoadingImage(
-                              size: size,
+                        fit: BoxFit.cover,
+                        errorWidget: (context, error, stackTrace) {
+                          return Container(
+                            width: 80.r,
+                            height: 80.r,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(10.0.r),
                             ),
-                          ),
-                        );
-                      },
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.error),
+                            child: Icon(
+                              Icons.no_food_rounded,
+                              color: Colors.white,
+                              size: 60.r,
+                            ),
+                          );
+                        },
+                      ),
                     ),
                     SizedBox(width: 16.r),
                     Column(
@@ -497,7 +499,7 @@ class WaitingStoreItem extends ConsumerWidget {
                                     '입장 마감 시간까지 $userCallTimeInSeconds초 남았어요.',
                                     fontSize: 12.r);
                               } else if (isMyEnteringTime == true) {
-                                return TextWidget('입장 시간이 되었습니다.',
+                                return TextWidget('곧 입장할 차례입니다!',
                                     fontSize: 12.r);
                               } else if (myWaitingIndex == -1 ||
                                   myWaitingIndex == null) {
@@ -567,6 +569,32 @@ class WaitingStoreItem extends ConsumerWidget {
                           buttonText: '네'),
                     ),
                   ),
+                SizedBox(height: 16.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextWidget("메뉴 사진은 앱 또는 각 항목을 클릭해서 확인 가능합니다.",
+                        fontSize: 10.sp),
+                    SizedBox(
+                      width: 8.w,
+                    ),
+                    SmallButtonWidget(
+                      text: "앱 바로가기",
+                      onPressed: () async {
+                        // 설치된 앱이 있는지 확인
+                        // final bool isInstalled =
+                        //     await canLaunchUrl("orre://store/${widget.storeDetailInfo.storeCode}");
+                        // if (await canLaunchUrl(telUri)) {
+                        //   await launchUrl(telUri);
+                        // } else {
+                        //   throw 'Could not launch $telUri';
+                        // }
+                      },
+                      fontSize: 12.sp,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16.h),
                 // StoreDetailInfo의 Menu를 출력하는 Scrollview 위젯
                 Expanded(
                   child: SingleChildScrollView(
