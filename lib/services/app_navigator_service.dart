@@ -22,7 +22,7 @@ void appNavigatorService(
     print('Running on Android');
     final Uri url = Uri(
       scheme: "https",
-      path: 'https://play.google.com/store/apps/details?id=com.aeioudev.orre',
+      path: 'play.google.com/store/apps/details?id=com.aeioudev.orre',
     );
     // 앱이 배포되면 false로 변경
     if (true) {
@@ -53,9 +53,10 @@ void appNavigatorService(
       userAgent.contains('mac')) {
     print('Running on iOS');
     final Uri url = Uri(
-      scheme: "itms-apps",
+      scheme: "https",
       path: 'apps.apple.com/kr/app/id6503636795',
     );
+    printd("url: ${url.toString()}");
 
     // 앱이 깔려 있다면 앱으로 이동
     // 없다면 앱스토어로 이동
@@ -64,7 +65,8 @@ void appNavigatorService(
       await launchUrl(urlScheme);
     } else {
       printd("can't launch");
-      await launchUrl(url);
+      // await launchUrl(url);
+      await launchUrl(Uri.parse('https://apps.apple.com/kr/app/id6503636795'));
     }
   } else {
     printd("Running on other");

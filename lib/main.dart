@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:orre_web/model/store_info_model.dart';
-import 'package:orre_web/widget/button/big_button_widget.dart';
 import 'package:orre_web/presenter/qr_scanner_widget.dart';
 import 'package:orre_web/presenter/waiting/waiting_screen.dart';
+import 'package:orre_web/provider/app_state_provider.dart';
 import 'package:orre_web/services/debug_services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +14,7 @@ import 'package:orre_web/services/nfc_services.dart';
 import 'package:orre_web/widget/background/waveform_background_widget.dart';
 import 'package:orre_web/widget/popup/alert_popup_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:universal_platform/universal_platform.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_strategy/url_strategy.dart';
@@ -116,11 +117,25 @@ final GoRouter _router = GoRouter(
   },
 );
 
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  HomePageState createState() => HomePageState();
+}
+
+class HomePageState extends ConsumerState<HomePage> {
+  @override
+  Future<void> didChangeDependencies() async {
+    super.didChangeDependencies();
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    printd("packageInfo: ${packageInfo.version}");
+
+    ref.read(appVersionProvider.notifier).setAppVersion(packageInfo.version);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: WaveformBackgroundWidget(
         backgroundColor: Colors.white,
@@ -133,22 +148,26 @@ class HomePage extends ConsumerWidget {
               TextWidget(
                 '오리',
                 fontFamily: 'Dovemayo_gothic',
-                fontSize: 48.sp,
-                color: const Color(0xFFFFB74D),
-                letterSpacing: 32.sp,
+                fontSize: 48.r,
+                // color: const Color(0xFFFFB74D),
+                color: Colors.black,
+                letterSpacing: 32.r,
               ),
-              const SizedBox(
-                height: 20,
+              SizedBox(
+                height: 20.r,
               ),
               ClipOval(
                 child: Container(
                   color: const Color(0xFFFFB74D),
                   child: Image.asset(
                     "assets/images/orre_logo.png",
-                    width: 0.3.sh,
-                    height: 0.3.sh,
+                    width: 200.r,
+                    height: 200.r,
                   ),
                 ),
+              ),
+              SizedBox(
+                height: 20.r,
               ),
               TextWidget(
                 '원격 줄서기, 원격 주문 서비스',
@@ -156,13 +175,46 @@ class HomePage extends ConsumerWidget {
                 fontSize: 16.sp,
                 color: const Color(0xFFFFB74D),
               ),
-              BigButtonWidget(
-                  text: 'storeInfo',
-                  onPressed: () {
-                    context.go('/reservation/1');
-                  }),
               const Spacer(),
+
               const Spacer(flex: 2),
+
+              // 사업자 정보 Footer
+              Container(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextWidget(
+                      "단모음데브 대표 정민호 | ",
+                      fontSize: 5.sp,
+                      color: Colors.grey,
+                    ),
+                    TextWidget("주소 : 경기도 용인시 기흥구 보정동 1189-3, 3층 일부 | ",
+                        fontSize: 5.sp, color: Colors.grey),
+                    TextWidget(
+                      "사업자 등록번호 865-18-02259 | ",
+                      fontSize: 5.sp,
+                      color: Colors.grey,
+                    ),
+                    Consumer(builder: (context, ref, child) {
+                      final appVersion = ref.watch(appVersionProvider);
+                      return TextWidget(
+                        "서비스 버전 : $appVersion",
+                        fontSize: 5.sp,
+                        color: Colors.grey,
+                      );
+                    }),
+                  ],
+                ),
+              ),
+
+              // BigButtonWidget(
+              //     text: 'storeInfo',
+              //     onPressed: () {
+              //       context.go('/reservation/1');
+              //     }),
             ],
           ),
         ),

@@ -19,6 +19,7 @@ import 'package:orre_web/widget/loading_indicator/coustom_loading_indicator.dart
 import 'package:orre_web/widget/popup/alert_popup_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../provider/app_state_provider.dart';
 import '../../provider/network/websocket/store_detail_info_state_notifier.dart';
@@ -79,6 +80,7 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
     super.didChangeDependencies();
 
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    printd("packageInfo: ${packageInfo.version}");
     ref.read(appVersionProvider.notifier).setAppVersion(packageInfo.version);
     ref
         .refresh(serviceLogProvider.notifier)
@@ -194,39 +196,66 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
                                 maximumSize: Size(0.5.sw, 50.r),
                                 textColor: Colors.white,
                                 textSize: 16.r,
-                                onPressed: () {
-                                  ref
-                                      .read(storeDetailInfoProvider.notifier)
-                                      .clearStoreDetailInfo();
+                                onPressed: () async {
+                                  final storeCode = widget.storeCode;
+                                  final base = Uri.base;
+                                  printd("base: $base");
+                                  // base에서 마지막 엔드포인트(/01092566504와 같은 번호) 제거
+                                  final reservationUrlString = base
+                                      .toString()
+                                      .split('/')
+                                      .sublist(0,
+                                          base.toString().split('/').length - 1)
+                                      .join('/');
+                                  final reservationUrl =
+                                      Uri.parse(reservationUrlString);
+                                  final baseUri =
+                                      base.toString().split('/').first;
+                                  printd("reservationUrl: $reservationUrl");
+                                  if (await canLaunchUrl(reservationUrl)) {
+                                    launchUrl(reservationUrl,
+                                        mode: LaunchMode.inAppBrowserView);
+                                  } else {
+                                    throw 'Could not launch $reservationUrl';
+                                  }
+                                  // ref
+                                  //     .read(storeDetailInfoProvider.notifier)
+                                  //     .clearStoreDetailInfo();
 
-                                  ref
-                                      .read(storeDetailInfoProvider.notifier)
-                                      .clearStoreDetailInfo();
-                                  ref
-                                      .read(storeWaitingRequestNotifierProvider
-                                          .notifier)
-                                      .clearWaitingRequestList();
-                                  ref
-                                      .read(storeWaitingInfoNotifierProvider
-                                          .notifier)
-                                      .clearWaitingInfo();
-                                  ref
-                                      .read(storeWaitingUserCallNotifierProvider
-                                          .notifier)
-                                      .unSubscribe();
-                                  context
-                                      .go('/reservation/${widget.storeCode}');
+                                  // ref
+                                  //     .read(storeDetailInfoProvider.notifier)
+                                  //     .clearStoreDetailInfo();
+                                  // ref
+                                  //     .read(storeWaitingRequestNotifierProvider
+                                  //         .notifier)
+                                  //     .clearWaitingRequestList();
+                                  // ref
+                                  //     .read(storeWaitingInfoNotifierProvider
+                                  //         .notifier)
+                                  //     .clearWaitingInfo();
+                                  // ref
+                                  //     .read(storeWaitingUserCallNotifierProvider
+                                  //         .notifier)
+                                  //     .unSubscribe();
+                                  // context.go('/reservation/$storeCode');
                                 },
                               ),
                             ],
                           );
                         }
 
-                        Future.delayed(Duration.zero, () {
-                          ref
-                              .read(serviceLogProvider.notifier)
-                              .reconnectWebsocketProvider(userLog);
-                        });
+                        final stomp =
+                            ref.watch(stompClientStateNotifierProvider);
+                        printd("stompActive: ${stomp?.isActive}");
+                        printd("stompConnected: ${stomp?.connected}");
+                        if (stomp?.isActive == true &&
+                            stomp?.connected == true) {
+                          Future.delayed(Duration.zero, () {
+                            ref
+                                .read(serviceLogProvider.notifier)
+                                .reconnectWebsocketProvider(userLog);
+                          });
+                        }
 
                         if (userLog.storeCode != widget.storeCode) {
                           return TextWidget('현재 웨이팅 중인 가게가 아닙니다.',
@@ -466,8 +495,7 @@ class WaitingStoreItem extends ConsumerWidget {
                             stream: ref
                                 .watch(
                                     storeWaitingInfoNotifierProvider.notifier)
-                                .subscribeToStoreWaitingInfo(
-                                    storeInfo.storeCode),
+                                .stream,
                             builder: ((context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
@@ -475,21 +503,54 @@ class WaitingStoreItem extends ConsumerWidget {
                                   ref
                                       .read(storeWaitingInfoNotifierProvider
                                           .notifier)
+                                      .subscribeToStoreWaitingInfo(
+                                          storeInfo.storeCode);
+                                  ref
+                                      .read(storeWaitingInfoNotifierProvider
+                                          .notifier)
                                       .sendStoreCode(storeInfo.storeCode);
                                 });
-                                return TextWidget('웨이팅 정보를 불러오는 중입니다...',
-                                    fontSize: 12.r);
+                                return Row(
+                                  children: [
+                                    TextWidget('정보를 불러오는 중..', fontSize: 12.sp),
+                                    SizedBox(width: 16.w),
+                                    SmallButtonWidget(
+                                        text: "새로고침",
+                                        fontSize: 8.sp,
+                                        minSize: Size(50.w, 40.h),
+                                        maxSize: Size(50.w, 40.h),
+                                        onPressed: () {
+                                          ref
+                                              .read(
+                                                  storeWaitingInfoNotifierProvider
+                                                      .notifier)
+                                              .clearWaitingInfo();
+                                          ref
+                                              .read(
+                                                  storeWaitingInfoNotifierProvider
+                                                      .notifier)
+                                              .subscribeToStoreWaitingInfo(
+                                                  storeInfo.storeCode);
+                                          ref
+                                              .read(
+                                                  storeWaitingInfoNotifierProvider
+                                                      .notifier)
+                                              .sendStoreCode(
+                                                  storeInfo.storeCode);
+                                        }),
+                                  ],
+                                );
                               } else if (snapshot.data == null) {
-                                Future.delayed(Duration.zero, () {
-                                  ref
-                                      .read(storeWaitingInfoNotifierProvider
-                                          .notifier)
-                                      .clearWaitingInfo();
-                                  ref
-                                      .read(storeWaitingInfoNotifierProvider
-                                          .notifier)
-                                      .sendStoreCode(storeInfo.storeCode);
-                                });
+                                // Future.delayed(Duration.zero, () {
+                                //   ref
+                                //       .read(storeWaitingInfoNotifierProvider
+                                //           .notifier)
+                                //       .clearWaitingInfo();
+                                //   ref
+                                //       .read(storeWaitingInfoNotifierProvider
+                                //           .notifier)
+                                //       .sendStoreCode(storeInfo.storeCode);
+                                // });
                                 return TextWidget(
                                   '웨이팅 정보를 불러오지 못했어요.',
                                   fontSize: 12.r,
@@ -597,9 +658,9 @@ class WaitingStoreItem extends ConsumerWidget {
                       width: 8.w,
                     ),
                     SmallButtonWidget(
-                      fontSize: 8.sp,
-                      minSize: Size(50.w, 20.h),
-                      maxSize: Size(50.w, 20.h),
+                      fontSize: 12.sp,
+                      minSize: Size(80.w, 40.h),
+                      maxSize: Size(80.w, 40.h),
                       text: "앱 바로가기",
                       onPressed: () async {
                         appNavigatorService(storeInfo, context);

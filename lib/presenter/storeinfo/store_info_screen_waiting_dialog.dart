@@ -257,19 +257,25 @@ class PhoneInputFormatter extends TextInputFormatter {
   String _getFormattedPhoneNumber(String value) {
     value = _cleanPhoneNumber(value);
 
+    //값이 없을 때 010최초값 포멧
     if (value.length == 1) {
-//값이 없을 때 010최초값 포멧
       value = kPhoneNumberPrefix + value.substring(0, value.length);
-    } else if (value.length < 4) {
-// 010 을 지우지 못하도록 010 유지
+    }
+    // 010 을 지우지 못하도록 010 유지
+    else if (value.length < 3) {
       value = kPhoneNumberPrefix;
-    } else if (value.length >= 8 && value.length < 12) {
-// 010xxxxxxxx 포멧
+    } else if (value.length > 11) {
+      if (value.startsWith("8210")) {
+        value = kPhoneNumberPrefix + value.substring(4, 12);
+      } else {}
+    }
+    // 010xxxxxxxx 포멧
+    else if (value.length >= 8 && value.length < 12) {
       value =
           '$kPhoneNumberPrefix${value.substring(3, 7)}${value.substring(7, value.length)}';
     } else {
-// 010xxxx 포멧 (자릿수 제한은 inputformatters 로 구현)
-      value = kPhoneNumberPrefix + value.substring(4, value.length);
+      // 010xxxx 포멧 (자릿수 제한은 inputformatters 로 구현)
+      value = kPhoneNumberPrefix + value.substring(3, value.length);
     }
 
     return value;
@@ -277,6 +283,6 @@ class PhoneInputFormatter extends TextInputFormatter {
 
   // 입력에서 숫자가 아닌 문자를 제거하는 메서드
   String _cleanPhoneNumber(String value) {
-    return value.replaceAll(RegExp(r'[-\s]'), '');
+    return value.replaceAll(RegExp(r'[^0-9]'), '');
   }
 }

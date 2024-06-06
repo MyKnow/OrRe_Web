@@ -77,6 +77,7 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
   void didChangeDependencies() async {
     printd("StoreDetailInfoWidget didChangeDependencies");
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    printd("packageInfo: ${packageInfo.version}");
     ref.read(appVersionProvider.notifier).setAppVersion(packageInfo.version);
     super.didChangeDependencies();
   }
