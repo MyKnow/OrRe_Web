@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:orre_web/presenter/storeinfo/agreement_screen_detail.dart';
-import 'package:orre_web/services/debug.services.dart';
+import 'package:orre_web/services/debug_services.dart';
 import 'package:orre_web/widget/appbar/static_app_bar_widget.dart';
 import 'package:orre_web/widget/background/waveform_background_widget.dart';
 import 'package:orre_web/widget/button/big_button_widget.dart';

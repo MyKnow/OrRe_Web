@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:orre_web/model/menu_info_model.dart';
 import 'package:orre_web/presenter/storeinfo/menu/store_info_screen_menu_popup_widget.dart';
-import 'package:orre_web/services/debug.services.dart';
+import 'package:orre_web/services/debug_services.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 
 class StoreMenuTileWidget extends ConsumerWidget {

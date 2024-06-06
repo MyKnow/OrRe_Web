@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:orre_web/services/debug.services.dart';
+import 'package:orre_web/services/debug_services.dart';
 
 class MenuInfo extends Equatable {
   final String menu;

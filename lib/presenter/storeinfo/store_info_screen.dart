@@ -1,20 +1,17 @@
-import 'dart:async';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
+import 'package:orre_web/provider/app_state_provider.dart';
 import 'package:orre_web/provider/network/websocket/store_waiting_info_request_state_notifier.dart';
-import 'package:orre_web/services/debug.services.dart';
+import 'package:orre_web/services/app_navigator_service.dart';
+import 'package:orre_web/services/debug_services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:orre_web/presenter/storeinfo/menu/store_info_screen_menu_category_list_widget.dart';
-import 'package:orre_web/provider/network/https/get_service_log_state_notifier.dart';
 import 'package:orre_web/provider/network/websocket/stomp_client_state_notifier.dart';
 import 'package:orre_web/widget/button/small_button_widget.dart';
 import 'package:orre_web/widget/loading_indicator/coustom_loading_indicator.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../model/store_info_model.dart';
 import '../../../provider/network/websocket/store_detail_info_state_notifier.dart';
@@ -22,6 +19,11 @@ import 'package:orre_web/presenter/storeinfo/store_info_screen_waiting_status.da
 import 'google_map_button_widget.dart';
 import 'store_call_button_widget.dart';
 import 'store_info_screen_button_selector.dart';
+
+import 'package:package_info_plus/package_info_plus.dart';
+
+// ignore: unused_import, avoid_web_libraries_in_flutter
+import 'dart:html' as html;
 
 class StoreDetailInfoWidget extends ConsumerStatefulWidget {
   final int storeCode;
@@ -69,6 +71,14 @@ class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
         }
       });
     });
+  }
+
+  @override
+  void didChangeDependencies() async {
+    printd("StoreDetailInfoWidget didChangeDependencies");
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    ref.read(appVersionProvider.notifier).setAppVersion(packageInfo.version);
+    super.didChangeDependencies();
   }
 
   @override
@@ -211,7 +221,7 @@ class _NonNullStoreDetailInfoWidgetState
               child: Column(
                 children: [
                   SizedBox(
-                    height: 32.h,
+                    height: 16.h,
                   ),
                   TextWidget("메뉴 사진은 앱 또는 각 항목을 클릭해서 확인 가능합니다.",
                       fontSize: 16.sp),
@@ -220,15 +230,11 @@ class _NonNullStoreDetailInfoWidgetState
                   ),
                   SmallButtonWidget(
                     text: "앱 바로가기",
+                    fontSize: 16.sp,
+                    minSize: Size(100.w, 40.h),
+                    maxSize: Size(100.w, 40.h),
                     onPressed: () async {
-                      // 설치된 앱이 있는지 확인
-                      // final bool isInstalled =
-                      //     await canLaunchUrl("orre://store/${widget.storeDetailInfo.storeCode}");
-                      // if (await canLaunchUrl(telUri)) {
-                      //   await launchUrl(telUri);
-                      // } else {
-                      //   throw 'Could not launch $telUri';
-                      // }
+                      appNavigatorService(widget.storeDetailInfo, context);
                     },
                   ),
                   SizedBox(
@@ -262,12 +268,25 @@ class _NonNullStoreDetailInfoWidgetState
                     TextWidget("주소 : 경기도 용인시 기흥구 보정동 1189-3, 3층 일부 | ",
                         fontSize: 6.sp, color: Colors.grey),
                     TextWidget(
-                      "사업자 등록번호 865-18-02259",
+                      "사업자 등록번호 865-18-02259 | ",
                       fontSize: 6.sp,
                       color: Colors.grey,
                     ),
+                    Consumer(builder: (context, ref, child) {
+                      final appVersion = ref.watch(appVersionProvider);
+                      return TextWidget(
+                        "서비스 버전 : $appVersion",
+                        fontSize: 6.sp,
+                        color: Colors.grey,
+                      );
+                    }),
                   ],
                 ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 48.h,
               ),
             ),
             // PopScope(

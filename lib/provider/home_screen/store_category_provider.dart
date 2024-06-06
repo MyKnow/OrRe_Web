@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:orre_web/services/debug.services.dart';
 
 enum StoreCategory { all, korean, chinese, japanese, western, snack, cafe, etc }
 

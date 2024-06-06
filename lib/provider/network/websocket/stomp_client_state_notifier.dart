@@ -1,13 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:orre_web/services/debug.services.dart';
+import 'package:orre_web/services/debug_services.dart';
 import 'package:orre_web/provider/error_state_notifier.dart';
-import 'package:orre_web/provider/network/https/get_service_log_state_notifier.dart';
-import 'package:orre_web/provider/network/websocket/store_detail_info_state_notifier.dart';
-import 'package:orre_web/provider/network/websocket/store_waiting_info_list_state_notifier.dart';
-import 'package:orre_web/provider/network/websocket/store_waiting_info_request_state_notifier.dart';
-import 'package:orre_web/provider/network/websocket/store_waiting_usercall_list_state_notifier.dart';
 import 'package:orre_web/services/network/websocket_services.dart';
 import 'package:stomp_dart_client/stomp_dart_client.dart';
 
@@ -62,7 +57,7 @@ class StompClientStateNotifier extends StateNotifier<StompClient?> {
         config: StompConfig(
           url: WebSocketService.url,
           onConnect: (StompFrame frame) {
-            final firstBoot = ref.read(firstStompSetup.notifier).state;
+            // final firstBoot = ref.read(firstStompSetup.notifier).state;
             ref.read(stompState.notifier).state = StompStatus.CONNECTED;
             streamController.add(StompStatus.CONNECTED);
             onConnectCallback(frame);

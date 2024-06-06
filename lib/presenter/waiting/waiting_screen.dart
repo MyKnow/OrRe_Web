@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable, unused_import, avoid_web_libraries_in_flutter
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,17 +12,22 @@ import 'package:orre_web/provider/network/https/get_service_log_state_notifier.d
 import 'package:orre_web/provider/network/websocket/stomp_client_state_notifier.dart';
 import 'package:orre_web/provider/network/websocket/store_waiting_usercall_list_state_notifier.dart';
 import 'package:orre_web/provider/waiting_usercall_time_list_state_notifier.dart';
-import 'package:orre_web/services/debug.services.dart';
+import 'package:orre_web/services/app_navigator_service.dart';
+import 'package:orre_web/services/debug_services.dart';
 import 'package:orre_web/widget/button/big_button_widget.dart';
 import 'package:orre_web/widget/loading_indicator/coustom_loading_indicator.dart';
 import 'package:orre_web/widget/popup/alert_popup_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
+import '../../provider/app_state_provider.dart';
 import '../../provider/network/websocket/store_detail_info_state_notifier.dart';
 import '../../provider/network/websocket/store_waiting_info_request_state_notifier.dart';
 import '../../provider/network/websocket/store_waiting_info_state_notifier.dart';
 import '../../widget/button/small_button_widget.dart';
 import 'waiting_screen_menu_category_list_widget.dart';
+
+import 'dart:html' as html;
 
 class WaitingScreen extends ConsumerStatefulWidget {
   final int storeCode;
@@ -65,6 +72,17 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
       }
       ref.read(waitingSuccessDialogProvider.notifier).state = null;
     });
+  }
+
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    ref.read(appVersionProvider.notifier).setAppVersion(packageInfo.version);
+    ref
+        .refresh(serviceLogProvider.notifier)
+        .fetchStoreServiceLog(widget.userPhoneNumber);
   }
 
   @override
@@ -130,7 +148,7 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
               SizedBox(height: 8.r),
               TextWidget(
                 '웨이팅 조회',
-                fontSize: 32.r,
+                fontSize: 24.sp,
                 color: const Color(0xFFFFB74D),
               ),
               Divider(
@@ -485,10 +503,10 @@ class WaitingStoreItem extends ConsumerWidget {
                               final myWaitingIndex = storeWaitingInfo
                                   ?.waitingTeamList
                                   .indexOf(myWaitingNumber);
-                              final storeEnteringTeamList =
-                                  storeWaitingInfo?.enteringTeamList;
-                              final isMyEnteringTime = storeEnteringTeamList
-                                  ?.contains(myWaitingNumber);
+                              // final storeEnteringTeamList =
+                              //     storeWaitingInfo?.enteringTeamList;
+                              // final isMyEnteringTime = storeEnteringTeamList
+                              //     ?.contains(myWaitingNumber);
                               final userCallTime =
                                   ref.watch(waitingUserCallTimeListProvider);
 
@@ -498,9 +516,9 @@ class WaitingStoreItem extends ConsumerWidget {
                                 return TextWidget(
                                     '입장 마감 시간까지 $userCallTimeInSeconds초 남았어요.',
                                     fontSize: 12.r);
-                              } else if (isMyEnteringTime == true) {
-                                return TextWidget('곧 입장할 차례입니다!',
-                                    fontSize: 12.r);
+                                // } else if (isMyEnteringTime == true) {
+                                //   return TextWidget('곧 입장할 차례입니다!',
+                                //       fontSize: 12.r);
                               } else if (myWaitingIndex == -1 ||
                                   myWaitingIndex == null) {
                                 return TextWidget('대기 중인 팀이 없습니다.',
@@ -532,8 +550,8 @@ class WaitingStoreItem extends ConsumerWidget {
                 if (userLog.status != StoreWaitingStatus.ENTERD)
                   BigButtonWidget(
                     text: '웨이팅 취소하기',
-                    textColor: const Color(0xFF999999),
-                    backgroundColor: const Color(0xFFDFDFDF),
+                    textColor: Colors.white,
+                    backgroundColor: const Color(0xFFFFB74D),
                     minimumSize: Size(0.9.sw, 40.r),
                     maximumSize: Size(0.9.sw, 50.r),
                     onPressed: () => showDialog(
@@ -579,18 +597,13 @@ class WaitingStoreItem extends ConsumerWidget {
                       width: 8.w,
                     ),
                     SmallButtonWidget(
+                      fontSize: 8.sp,
+                      minSize: Size(50.w, 20.h),
+                      maxSize: Size(50.w, 20.h),
                       text: "앱 바로가기",
                       onPressed: () async {
-                        // 설치된 앱이 있는지 확인
-                        // final bool isInstalled =
-                        //     await canLaunchUrl("orre://store/${widget.storeDetailInfo.storeCode}");
-                        // if (await canLaunchUrl(telUri)) {
-                        //   await launchUrl(telUri);
-                        // } else {
-                        //   throw 'Could not launch $telUri';
-                        // }
+                        appNavigatorService(storeInfo, context);
                       },
-                      fontSize: 12.sp,
                     ),
                   ],
                 ),
@@ -601,6 +614,36 @@ class WaitingStoreItem extends ConsumerWidget {
                     child: WaitingScreenStoreMenuCategoryListWidget(
                       storeDetailInfo: storeInfo,
                     ),
+                  ),
+                ),
+                // 사업자 정보 Footer
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextWidget(
+                        "단모음데브 대표 정민호 | ",
+                        fontSize: 5.sp,
+                        color: Colors.grey,
+                      ),
+                      TextWidget("주소 : 경기도 용인시 기흥구 보정동 1189-3, 3층 일부 | ",
+                          fontSize: 5.sp, color: Colors.grey),
+                      TextWidget(
+                        "사업자 등록번호 865-18-02259 | ",
+                        fontSize: 5.sp,
+                        color: Colors.grey,
+                      ),
+                      Consumer(builder: (context, ref, child) {
+                        final appVersion = ref.watch(appVersionProvider);
+                        return TextWidget(
+                          "서비스 버전 : $appVersion",
+                          fontSize: 5.sp,
+                          color: Colors.grey,
+                        );
+                      }),
+                    ],
                   ),
                 ),
               ],

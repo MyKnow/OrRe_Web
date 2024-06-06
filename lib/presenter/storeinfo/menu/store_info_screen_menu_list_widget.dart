@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:orre_web/model/menu_info_model.dart';
 import 'package:orre_web/presenter/storeinfo/menu/store_info_screen_menu_tilie_widget.dart';
-import 'package:orre_web/services/debug.services.dart';
+import 'package:orre_web/services/debug_services.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 
 import '../../../../model/store_info_model.dart';

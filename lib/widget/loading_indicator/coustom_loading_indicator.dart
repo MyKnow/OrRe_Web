@@ -5,6 +5,7 @@ import 'package:orre_web/widget/button/big_button_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+// ignore: must_be_immutable
 class CustomLoadingIndicator extends ConsumerWidget {
   String who = '';
   CustomLoadingIndicator({super.key, required this.who});

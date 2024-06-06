@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:orre_web/services/debug.services.dart';
+import 'package:orre_web/services/debug_services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:orre_web/model/location_model.dart';
 import '../../services/geocording/geocording_library_service.dart'; // 추가

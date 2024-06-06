@@ -8,7 +8,7 @@ import 'package:orre_web/presenter/storeinfo/agreement_screen.dart';
 import 'package:orre_web/provider/network/websocket/stomp_client_state_notifier.dart';
 import 'package:orre_web/provider/network/websocket/store_detail_info_state_notifier.dart';
 import 'package:orre_web/provider/network/websocket/store_waiting_info_state_notifier.dart';
-import 'package:orre_web/services/debug.services.dart';
+import 'package:orre_web/services/debug_services.dart';
 import 'package:orre_web/widget/button/small_button_widget.dart';
 import 'package:orre_web/widget/popup/alert_popup_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
@@ -60,9 +60,10 @@ class WaitingDialog extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SmallButtonWidget(
-                    minSize: Size(170.r, 50.r),
-                    maxSize: Size(170.r, 50.r),
-                    text: ' 이용약관 동의하기 ',
+                    minSize: Size(110.w, 50.r),
+                    maxSize: Size(150.w, 50.r),
+                    text: ' 이용약관 동의 ',
+                    fontSize: 16.sp,
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -71,10 +72,16 @@ class WaitingDialog extends ConsumerWidget {
                       );
                     }),
                 SizedBox(width: 8.r),
-                if (agreement == false)
-                  const Icon(Icons.cancel, color: Colors.red)
-                else
-                  const Icon(Icons.check, color: Colors.green),
+                Checkbox(
+                  checkColor: Colors.white,
+                  activeColor: const Color(0xFFFFB74D),
+                  value: agreement,
+                  onChanged: (value) {
+                    if (value != null) {
+                      ref.read(agreementState.notifier).state = value;
+                    }
+                  },
+                ),
               ],
             ),
 
@@ -94,7 +101,7 @@ class WaitingDialog extends ConsumerWidget {
                 ),
                 Container(
                   padding:
-                      EdgeInsets.symmetric(horizontal: 12.r, vertical: 0.r),
+                      EdgeInsets.symmetric(horizontal: 12.r, vertical: 8.r),
                   width: 48.sp,
                   height: 48.sp,
                   decoration: BoxDecoration(

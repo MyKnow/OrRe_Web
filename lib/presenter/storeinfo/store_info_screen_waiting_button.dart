@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:orre_web/services/debug.services.dart';
+import 'package:orre_web/services/debug_services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:orre_web/widget/text/text_widget.dart';

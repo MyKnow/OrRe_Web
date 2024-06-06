@@ -1,8 +1,4 @@
 // import 'package:flutter/material.dart';
-import 'package:orre_web/services/debug.services.dart';
-//
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:orre_web/services/debug.services.dart';
 // import 'package:orre_web/widget/text/text_widget.dart';
 
 // import '../../provider/home_screen/store_category_provider.dart';
