@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:orre_web/model/store_info_model.dart';
 import 'package:orre_web/presenter/qr_scanner_widget.dart';
 import 'package:orre_web/presenter/waiting/waiting_screen.dart';
-import 'package:orre_web/provider/app_state_provider.dart';
 import 'package:orre_web/services/debug_services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,12 +13,12 @@ import 'package:orre_web/services/nfc_services.dart';
 import 'package:orre_web/widget/background/waveform_background_widget.dart';
 import 'package:orre_web/widget/popup/alert_popup_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:universal_platform/universal_platform.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_strategy/url_strategy.dart';
 
 import 'presenter/storeinfo/store_info_screen.dart';
+import 'services/app_version_service.dart';
 
 class RouterObserver extends NavigatorObserver {
   @override
@@ -117,6 +116,24 @@ final GoRouter _router = GoRouter(
   },
 );
 
+class ErrorPage extends StatelessWidget {
+  final Exception? error;
+
+  const ErrorPage(this.error, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const TextWidget('Error'),
+      ),
+      body: Center(
+        child: Text(error?.toString() ?? 'Unknown error'),
+      ),
+    );
+  }
+}
+
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
@@ -126,12 +143,9 @@ class HomePage extends ConsumerStatefulWidget {
 
 class HomePageState extends ConsumerState<HomePage> {
   @override
-  Future<void> didChangeDependencies() async {
-    super.didChangeDependencies();
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    printd("packageInfo: ${packageInfo.version}");
-
-    ref.read(appVersionProvider.notifier).setAppVersion(packageInfo.version);
+  void initState() {
+    super.initState();
+    initializePackageInfo(ref);
   }
 
   @override
@@ -149,7 +163,6 @@ class HomePageState extends ConsumerState<HomePage> {
                 '오리',
                 fontFamily: 'Dovemayo_gothic',
                 fontSize: 48.r,
-                // color: const Color(0xFFFFB74D),
                 color: Colors.black,
                 letterSpacing: 32.r,
               ),
@@ -176,9 +189,7 @@ class HomePageState extends ConsumerState<HomePage> {
                 color: const Color(0xFFFFB74D),
               ),
               const Spacer(),
-
               const Spacer(flex: 2),
-
               // 사업자 정보 Footer
               Container(
                 padding: const EdgeInsets.all(20),
@@ -199,9 +210,10 @@ class HomePageState extends ConsumerState<HomePage> {
                       color: Colors.grey,
                     ),
                     Consumer(builder: (context, ref, child) {
-                      final appVersion = ref.watch(appVersionProvider);
+                      // final appVersion =
+                      //     _appVersion ?? ref.watch(appVersionProvider);
                       return TextWidget(
-                        "서비스 버전 : $appVersion",
+                        "서비스 버전 : ${getAppVersion()}",
                         fontSize: 5.sp,
                         color: Colors.grey,
                       );
@@ -209,12 +221,6 @@ class HomePageState extends ConsumerState<HomePage> {
                   ],
                 ),
               ),
-
-              // BigButtonWidget(
-              //     text: 'storeInfo',
-              //     onPressed: () {
-              //       context.go('/reservation/1');
-              //     }),
             ],
           ),
         ),
@@ -238,27 +244,6 @@ class HomePageState extends ConsumerState<HomePage> {
           shape: const CircleBorder(),
         ),
         children: [
-          // ElevatedButton(
-          //   onPressed: () async {
-          //     var res = await Navigator.push(
-          //         context,
-          //         MaterialPageRoute(
-          //           builder: (context) => const SimpleBarcodeScannerPage(),
-          //         ));
-          //     if (res != null) {
-          //       showDialog(
-          //         context: context,
-          //         builder: (context) => AlertPopupWidget(
-          //           title: "바코드 스캔 결과",
-          //           multiLineText: res,
-          //           buttonText: '확인',
-          //           cancelButton: false,
-          //         ),
-          //       );
-          //     }
-          //   },
-          //   child: const Text('Open Scanner'),
-          // ),
           FloatingActionButton.large(
             heroTag: 'qr',
             shape: const CircleBorder(),
@@ -295,7 +280,6 @@ class HomePageState extends ConsumerState<HomePage> {
             tooltip: 'NFC 스캔',
             child: const Icon(Icons.nfc_rounded),
           ),
-          // 오리와 계약을 원하시는 업체는 아래 버튼을 눌러주세요.
           FloatingActionButton.large(
             heroTag: 'contract',
             shape: const CircleBorder(),
@@ -310,7 +294,6 @@ class HomePageState extends ConsumerState<HomePage> {
                   buttonText: '계약 방법 보기',
                   cancelButton: true,
                   onPressed: () {
-                    // 다른 웹페이지 링크로 이동
                     launchUrl(Uri.parse(
                         'https://aeioudev.notion.site/db6980c4bb4748e1a73cc9ce83b033bc?pvs=4'));
                   },
@@ -321,24 +304,6 @@ class HomePageState extends ConsumerState<HomePage> {
             child: const Icon(Icons.business_rounded),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class ErrorPage extends StatelessWidget {
-  final Exception? error;
-
-  const ErrorPage(this.error, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const TextWidget('Error'),
-      ),
-      body: Center(
-        child: Text(error?.toString() ?? 'Unknown error'),
       ),
     );
   }

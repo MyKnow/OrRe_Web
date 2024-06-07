@@ -25,6 +25,7 @@ import '../../provider/app_state_provider.dart';
 import '../../provider/network/websocket/store_detail_info_state_notifier.dart';
 import '../../provider/network/websocket/store_waiting_info_request_state_notifier.dart';
 import '../../provider/network/websocket/store_waiting_info_state_notifier.dart';
+import '../../services/app_version_service.dart';
 import '../../widget/button/small_button_widget.dart';
 import 'waiting_screen_menu_category_list_widget.dart';
 
@@ -323,13 +324,29 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
   }
 }
 
-class WaitingStoreItem extends ConsumerWidget {
+class WaitingStoreItem extends ConsumerStatefulWidget {
   final UserLogs userLog;
 
   const WaitingStoreItem({super.key, required this.userLog});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  _WaitingStoreItemState createState() =>
+      _WaitingStoreItemState(userLog: userLog);
+}
+
+class _WaitingStoreItemState extends ConsumerState<WaitingStoreItem> {
+  final UserLogs userLog;
+
+  _WaitingStoreItemState({required this.userLog});
+
+  @override
+  void initState() {
+    super.initState();
+    initializePackageInfo(ref);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     printd("WaitingStoreItem build");
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
@@ -699,7 +716,7 @@ class WaitingStoreItem extends ConsumerWidget {
                       Consumer(builder: (context, ref, child) {
                         final appVersion = ref.watch(appVersionProvider);
                         return TextWidget(
-                          "서비스 버전 : $appVersion",
+                          "서비스 버전 : ${getAppVersion()}",
                           fontSize: 5.sp,
                           color: Colors.grey,
                         );

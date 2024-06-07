@@ -1,7 +1,7 @@
 name: orre_web
 description: "원격 웨이팅, 원격 주문"
 publish_to: 'none'
-version: 1.0.2+3
+version: 1.0.3+4
 
 environment:
   sdk: '>=3.3.4 <4.0.0'
@@ -48,6 +48,7 @@ dependencies:
   url_launcher: ^6.2.6
   url_strategy: ^0.2.0
   package_info_plus: ^8.0.0
+  flutter_svg: ^2.0.10+1
 
 dev_dependencies:
   flutter_test:
@@ -59,8 +60,8 @@ flutter:
   assets: 
     - assets/images/orre_logo.png
     - assets/images/loading_orre.gif
-    - assets/images/waveform/wave_shadow.png
-    - assets/images/waveform/wave.png
+    - assets/images/waveform/orre_wave_shadow.svg
+    - assets/images/waveform/orre_wave.svg
 
   fonts :
     - family: Dovemayo_gothic

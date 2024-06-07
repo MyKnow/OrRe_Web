@@ -16,6 +16,7 @@ import 'package:orre_web/widget/text/text_widget.dart';
 import '../../../model/store_info_model.dart';
 import '../../../provider/network/websocket/store_detail_info_state_notifier.dart';
 import 'package:orre_web/presenter/storeinfo/store_info_screen_waiting_status.dart';
+import '../../services/app_version_service.dart';
 import 'google_map_button_widget.dart';
 import 'store_call_button_widget.dart';
 import 'store_info_screen_button_selector.dart';
@@ -123,6 +124,12 @@ class NonNullStoreDetailInfoWidget extends ConsumerStatefulWidget {
 
 class _NonNullStoreDetailInfoWidgetState
     extends ConsumerState<NonNullStoreDetailInfoWidget> {
+  @override
+  void initState() {
+    super.initState();
+    initializePackageInfo(ref);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -276,7 +283,7 @@ class _NonNullStoreDetailInfoWidgetState
                     Consumer(builder: (context, ref, child) {
                       final appVersion = ref.watch(appVersionProvider);
                       return TextWidget(
-                        "서비스 버전 : $appVersion",
+                        "서비스 버전 : ${getAppVersion()}",
                         fontSize: 6.sp,
                         color: Colors.grey,
                       );
