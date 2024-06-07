@@ -533,7 +533,7 @@ class _WaitingStoreItemState extends ConsumerState<WaitingStoreItem> {
                                     SizedBox(width: 16.w),
                                     SmallButtonWidget(
                                         text: "새로고침",
-                                        fontSize: 8.sp,
+                                        fontSize: 9.sp,
                                         minSize: Size(50.w, 40.h),
                                         maxSize: Size(50.w, 40.h),
                                         onPressed: () {
@@ -677,8 +677,8 @@ class _WaitingStoreItemState extends ConsumerState<WaitingStoreItem> {
                     ),
                     SmallButtonWidget(
                       fontSize: 12.sp,
-                      minSize: Size(70.w, 20.sp),
-                      maxSize: Size(70.w, 20.sp),
+                      minSize: Size(70.w, 40.h),
+                      maxSize: Size(70.w, 40.h),
                       text: "앱 바로가기",
                       onPressed: () async {
                         appNavigatorService(storeInfo, context);

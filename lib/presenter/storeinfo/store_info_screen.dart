@@ -239,8 +239,8 @@ class _NonNullStoreDetailInfoWidgetState
                   SmallButtonWidget(
                     text: "앱 바로가기",
                     fontSize: 16.sp,
-                    minSize: Size(90.w, 26.sp),
-                    maxSize: Size(90.w, 26.sp),
+                    minSize: Size(90.w, 50.h),
+                    maxSize: Size(90.w, 50.h),
                     onPressed: () async {
                       appNavigatorService(widget.storeDetailInfo, context);
                     },
@@ -281,7 +281,7 @@ class _NonNullStoreDetailInfoWidgetState
                       color: Colors.grey,
                     ),
                     Consumer(builder: (context, ref, child) {
-                      final appVersion = ref.watch(appVersionProvider);
+                      // final appVersion = ref.watch(appVersionProvider);
                       return TextWidget(
                         "서비스 버전 : ${getAppVersion()}",
                         fontSize: 6.sp,

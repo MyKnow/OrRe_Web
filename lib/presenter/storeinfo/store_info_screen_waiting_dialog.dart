@@ -60,8 +60,8 @@ class WaitingDialog extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SmallButtonWidget(
-                    minSize: Size(110.w, 24.sp),
-                    maxSize: Size(110.w, 24.sp),
+                    minSize: Size(110.w, 50.h),
+                    maxSize: Size(110.w, 50.h),
                     text: '이용약관 동의  ',
                     fontSize: 16.sp,
                     onPressed: () {
