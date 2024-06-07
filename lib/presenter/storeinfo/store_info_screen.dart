@@ -239,8 +239,8 @@ class _NonNullStoreDetailInfoWidgetState
                   SmallButtonWidget(
                     text: "앱 바로가기",
                     fontSize: 16.sp,
-                    minSize: Size(100.w, 40.h),
-                    maxSize: Size(100.w, 40.h),
+                    minSize: Size(90.w, 26.sp),
+                    maxSize: Size(90.w, 26.sp),
                     onPressed: () async {
                       appNavigatorService(widget.storeDetailInfo, context);
                     },

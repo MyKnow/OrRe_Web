@@ -628,6 +628,7 @@ class _WaitingStoreItemState extends ConsumerState<WaitingStoreItem> {
                 if (userLog.status != StoreWaitingStatus.ENTERD)
                   BigButtonWidget(
                     text: '웨이팅 취소하기',
+                    textSize: 16.sp,
                     textColor: Colors.white,
                     backgroundColor: const Color(0xFFFFB74D),
                     minimumSize: Size(0.9.sw, 40.r),
@@ -676,8 +677,8 @@ class _WaitingStoreItemState extends ConsumerState<WaitingStoreItem> {
                     ),
                     SmallButtonWidget(
                       fontSize: 12.sp,
-                      minSize: Size(80.w, 40.h),
-                      maxSize: Size(80.w, 40.h),
+                      minSize: Size(70.w, 20.sp),
+                      maxSize: Size(70.w, 20.sp),
                       text: "앱 바로가기",
                       onPressed: () async {
                         appNavigatorService(storeInfo, context);

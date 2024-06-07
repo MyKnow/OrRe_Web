@@ -58,10 +58,8 @@ class BottomButtonSelector extends ConsumerWidget {
                 return AlertPopupWidget(
                   title: "웨이팅 불가",
                   subtitle: message,
-                  autoPop: false,
                   onPressed: waitingStoreCode != null
                       ? () {
-                          Navigator.of(context).pop();
                           Navigator.of(context).pushReplacement(
                             MaterialPageRoute(
                               builder: (context) => StoreDetailInfoWidget(
