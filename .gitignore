@@ -40,3 +40,6 @@ app.*.map.json
 
 # web ignore
 web/index.html
+
+# secret ignore
+.env

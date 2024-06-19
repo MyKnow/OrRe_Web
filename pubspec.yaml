@@ -58,6 +58,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets: 
+    - .env
     - assets/images/orre_logo.png
     - assets/images/loading_orre.gif
     - assets/images/waveform/orre_wave_shadow.svg

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:orre_web/model/store_info_model.dart';
@@ -9,11 +10,9 @@ import 'package:orre_web/services/debug_services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:orre_web/services/nfc_services.dart';
 import 'package:orre_web/widget/background/waveform_background_widget.dart';
 import 'package:orre_web/widget/popup/alert_popup_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
-import 'package:universal_platform/universal_platform.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_strategy/url_strategy.dart';
 
@@ -45,6 +44,7 @@ class RouterObserver extends NavigatorObserver {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setPathUrlStrategy();
+  await dotenv.load(fileName: ".env");
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(const ProviderScope(child: MyApp()));
 }
@@ -255,30 +255,6 @@ class HomePageState extends ConsumerState<HomePage> {
             ),
             tooltip: 'QR코드 스캔',
             child: const Icon(Icons.qr_code_scanner_rounded),
-          ),
-          FloatingActionButton.large(
-            heroTag: 'nfc',
-            shape: const CircleBorder(),
-            foregroundColor: Colors.white,
-            backgroundColor: const Color(0xFFFFB74D),
-            onPressed: () {
-              if (UniversalPlatform.isWeb) {
-                showDialog(
-                  context: context,
-                  builder: (context) => const AlertPopupWidget(
-                    title: "NFC 스캔 오류",
-                    multiLineText:
-                        "웹에서는 NFC 스캔을 지원하지 않습니다.\n바탕화면에서 바로 태그를 스캔해주세요.",
-                    buttonText: '확인',
-                    cancelButton: false,
-                  ),
-                );
-              } else {
-                startNFCScan(ref, context);
-              }
-            },
-            tooltip: 'NFC 스캔',
-            child: const Icon(Icons.nfc_rounded),
           ),
           FloatingActionButton.large(
             heroTag: 'contract',
