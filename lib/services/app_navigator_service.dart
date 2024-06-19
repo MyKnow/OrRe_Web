@@ -17,11 +17,8 @@ void appNavigatorService(
   printd("userAgent: $userAgent");
   if (userAgent.contains('android')) {
     print('Running on Android');
-    final Uri url = Uri(
-      scheme: "https",
-      path: 'play.google.com/store/apps/details?id=com.aeioudev.orre',
-    );
-    // 앱이 배포되면 false로 변경
+
+    // TODO : 앱이 배포되면 false로 변경
     if (true) {
       showDialog(
           context: context,
@@ -43,27 +40,19 @@ void appNavigatorService(
           });
       // ignore: dead_code
     } else {
-      // URL을 먼저 시도해봅니다.
-      await launchUrl(urlSchemeUri);
-      Future.delayed(Duration(seconds: 2), () async {
-        if (!await canLaunchUrl(urlSchemeUri)) {
-          await launchUrl(url);
-        }
-      });
+      final Uri playStoreUri = Uri(
+        scheme: "https",
+        path: 'play.google.com/store/apps/details?id=com.aeioudev.orre',
+      );
+      await launchApp(urlSchemeUri, playStoreUri);
     }
   } else if (userAgent.contains('iphone') ||
       userAgent.contains('ipad') ||
       userAgent.contains('mac os')) {
     print('Running on iOS');
+    final appStoreUri = Uri.parse('https://apps.apple.com/kr/app/id6503636795');
 
-    // URL을 먼저 시도해봅니다.
-    await launchUrl(urlSchemeUri);
-    Future.delayed(Duration(seconds: 2), () async {
-      if (!await canLaunchUrl(urlSchemeUri)) {
-        await launchUrl(
-            Uri.parse('https://apps.apple.com/kr/app/id6503636795'));
-      }
-    });
+    await launchApp(urlSchemeUri, appStoreUri);
   } else {
     printd("Running on other");
     showDialog(
@@ -76,5 +65,21 @@ void appNavigatorService(
             buttonText: '확인',
           );
         });
+  }
+}
+
+Future<void> launchApp(Uri urlSchemeUri, Uri? storeUri) async {
+  await launchUrl(urlSchemeUri);
+  if (storeUri != null) {
+    Future.delayed(
+      const Duration(seconds: 2),
+      () async {
+        if (!await canLaunchUrl(urlSchemeUri)) {
+          await launchUrl(
+            storeUri,
+          );
+        }
+      },
+    );
   }
 }
