@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:orre_web/model/store_info_model.dart';
+import 'package:orre_web/presenter/legal/company_footer.dart';
 import 'package:orre_web/presenter/qr_scanner_widget.dart';
 import 'package:orre_web/presenter/waiting/waiting_screen.dart';
 import 'package:orre_web/services/debug_services.dart';
@@ -16,6 +17,7 @@ import 'package:orre_web/widget/text/text_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_strategy/url_strategy.dart';
 
+import 'presenter/legal/oss_licenses_screen.dart';
 import 'presenter/storeinfo/store_info_screen.dart';
 import 'services/app_version_service.dart';
 
@@ -109,6 +111,13 @@ final GoRouter _router = GoRouter(
             storeCode: storeCode, userPhoneNumber: userPhoneNumber);
       },
     ),
+    GoRoute(
+      path: '/legal/license',
+      builder: (context, state) {
+        printd("Navigating to LicensePage, fullPath: ${state.fullPath}");
+        return const OssLicensesPage();
+      },
+    ),
   ],
   errorBuilder: (context, state) {
     printd('Error: ${state.error}');
@@ -191,36 +200,7 @@ class HomePageState extends ConsumerState<HomePage> {
               const Spacer(),
               const Spacer(flex: 2),
               // 사업자 정보 Footer
-              Container(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    TextWidget(
-                      "단모음데브 대표 정민호 | ",
-                      fontSize: 5.sp,
-                      color: Colors.grey,
-                    ),
-                    TextWidget("주소 : 경기도 용인시 기흥구 보정동 1189-3, 3층 일부 | ",
-                        fontSize: 5.sp, color: Colors.grey),
-                    TextWidget(
-                      "사업자 등록번호 865-18-02259 | ",
-                      fontSize: 5.sp,
-                      color: Colors.grey,
-                    ),
-                    Consumer(builder: (context, ref, child) {
-                      // final appVersion =
-                      //     _appVersion ?? ref.watch(appVersionProvider);
-                      return TextWidget(
-                        "서비스 버전 : ${getAppVersion()}",
-                        fontSize: 5.sp,
-                        color: Colors.grey,
-                      );
-                    }),
-                  ],
-                ),
-              ),
+              CompanyFooter(5.sp),
             ],
           ),
         ),

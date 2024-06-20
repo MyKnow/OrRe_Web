@@ -49,6 +49,7 @@ dependencies:
   url_strategy: ^0.2.0
   package_info_plus: ^8.0.0
   flutter_svg: ^2.0.10+1
+  flutter_oss_licenses: ^3.0.2
 
 dev_dependencies:
   flutter_test:

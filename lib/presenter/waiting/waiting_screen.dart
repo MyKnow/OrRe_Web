@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:orre_web/presenter/legal/company_footer.dart';
 import 'package:orre_web/presenter/storeinfo/google_map_button_widget.dart';
 import 'package:orre_web/presenter/storeinfo/store_call_button_widget.dart';
 import 'package:orre_web/presenter/storeinfo/store_info_screen_waiting_dialog.dart';
@@ -699,35 +700,7 @@ class WaitingStoreItemState extends ConsumerState<WaitingStoreItem> {
                   ),
                 ),
                 // 사업자 정보 Footer
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextWidget(
-                        "단모음데브 대표 정민호 | ",
-                        fontSize: 5.sp,
-                        color: Colors.grey,
-                      ),
-                      TextWidget("주소 : 경기도 용인시 기흥구 보정동 1189-3, 3층 일부 | ",
-                          fontSize: 5.sp, color: Colors.grey),
-                      TextWidget(
-                        "사업자 등록번호 865-18-02259 | ",
-                        fontSize: 5.sp,
-                        color: Colors.grey,
-                      ),
-                      Consumer(builder: (context, ref, child) {
-                        final appVersion = ref.watch(appVersionProvider);
-                        return TextWidget(
-                          "서비스 버전 : ${getAppVersion()}",
-                          fontSize: 5.sp,
-                          color: Colors.grey,
-                        );
-                      }),
-                    ],
-                  ),
-                ),
+                CompanyFooter(5.sp),
               ],
             ),
           ),
