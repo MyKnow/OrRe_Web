@@ -74,7 +74,7 @@ read -p "Enter commit message: " commit_message
 
 # Git commit and push
 git add .
-echo "${commit_message}" > .git/COMMIT_EDITMSG
+echo "[${new_version}] ${commit_message}" > .git/COMMIT_EDITMSG
 git commit -F .git/COMMIT_EDITMSG
 git push origin myknow
 
