@@ -198,7 +198,7 @@ extension APIResponseStatusExtension on APIResponseStatus {
 }
 
 class HttpsService {
-  static final String _defaultUrl = dotenv.get('ORRE_HTTP_URL');
+  static final String _defaultUrl = dotenv.get('ORRE_HTTPS_URL');
 
   static Uri getUri(String url) {
     return Uri.parse(_defaultUrl + url);
