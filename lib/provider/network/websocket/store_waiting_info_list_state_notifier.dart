@@ -55,14 +55,14 @@ class StoreWaitingInfoListNotifier
                 // saveState();
               }
             }
-            // print("state : $state");
+            // printd("state : $state");
           }
         },
       );
-      // print("StoreWaitingInfoList/${storeCode} : subscribe!");
+      // printd("StoreWaitingInfoList/${storeCode} : subscribe!");
       sendStoreCode(storeCode);
     } else {
-      // print("StoreWaitingInfoList/${storeCode} : already subscribed!");
+      // printd("StoreWaitingInfoList/${storeCode} : already subscribed!");
     }
   }
 
@@ -110,7 +110,7 @@ class StoreWaitingInfoListNotifier
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<StoreWaitingInfo> storeWaitingInfoList = state;
     String encodedList = json.encode(storeWaitingInfoList);
-    // print("waitingInfoList saveState encodedList : $encodedList");
+    // printd("waitingInfoList saveState encodedList : $encodedList");
     prefs.setString('waitingInfoList', encodedList);
   }
 

@@ -90,7 +90,7 @@ class StoreWaitingRequestNotifier extends StateNotifier<StoreWaitingRequest?> {
           //   printd("WaitingRequest waitingCancelSubcribeComplete : Success");
           //   completer.complete(true);
           // } else {
-          //   // print("WaitingRequest waitingCancelSubcribeComplete : Fail 1");
+          //   // printd("WaitingRequest waitingCancelSubcribeComplete : Fail 1");
           //   // completer.complete(false);
           // }
         } else {

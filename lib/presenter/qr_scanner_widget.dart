@@ -60,7 +60,7 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
   Widget build(BuildContext context) {
     // 웹에서 카메라 권한 요청
     // ignore: avoid_print
-    print('카메라 권한 요청');
+    printd('카메라 권한 요청');
 
     return Scaffold(
       // backgroundColor: const Color(0xFFFFB74D),

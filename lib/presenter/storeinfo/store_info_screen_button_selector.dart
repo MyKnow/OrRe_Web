@@ -7,6 +7,8 @@ import 'package:orre_web/provider/network/websocket/store_waiting_info_request_s
 import 'package:orre_web/widget/popup/alert_popup_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 
+import '../../services/debug_services.dart';
+
 class BottomButtonSelector extends ConsumerWidget {
   final StoreDetailInfo storeDetailInfo;
   final bool nowWaitable;
@@ -22,7 +24,7 @@ class BottomButtonSelector extends ConsumerWidget {
     final storeCode = storeDetailInfo.storeCode;
     final myWaitingInfo = ref.watch(storeWaitingRequestNotifierProvider);
 
-    print(
+    printd(
         "BottomButtonSelector build!!!!!!!!!!!!!!!!! ${storeDetailInfo.waitingAvailable} : $nowWaitable ");
 
     if (myWaitingInfo == null) {

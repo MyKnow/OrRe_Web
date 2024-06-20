@@ -27,7 +27,7 @@ void appNavigatorService(StoreDetailInfo storeDetailInfo, BuildContext context,
 
   printd("userAgent: $userAgent");
   if (userAgent.contains('android')) {
-    print('Running on Android');
+    printd('Running on Android');
 
     // TODO : 앱이 배포되면 false로 변경
     if (true) {
@@ -56,7 +56,7 @@ void appNavigatorService(StoreDetailInfo storeDetailInfo, BuildContext context,
   } else if (userAgent.contains('iphone') ||
       userAgent.contains('ipad') ||
       userAgent.contains('mac os')) {
-    print('Running on iOS');
+    printd('Running on iOS');
 
     await launchApp(urlSchemeUri, appStoreUri);
   } else {

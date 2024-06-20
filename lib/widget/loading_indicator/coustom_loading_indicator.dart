@@ -5,6 +5,8 @@ import 'package:orre_web/widget/button/big_button_widget.dart';
 import 'package:orre_web/widget/text/text_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../services/debug_services.dart';
+
 // ignore: must_be_immutable
 class CustomLoadingIndicator extends ConsumerWidget {
   String who = '';
@@ -12,7 +14,7 @@ class CustomLoadingIndicator extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print("CustomLoadingIndicator build who: $who");
+    printd("CustomLoadingIndicator build who: $who");
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment

@@ -110,7 +110,7 @@ class StoreWaitingInfoNotifier extends StateNotifier<StoreWaitingInfo?> {
   void saveState() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String encodedList = json.encode(StoreWaitingInfo);
-    // print("waitingInfoList saveState encodedList : $encodedList");
+    // printd("waitingInfoList saveState encodedList : $encodedList");
     prefs.setString('waitingInfoList', encodedList);
   }
 

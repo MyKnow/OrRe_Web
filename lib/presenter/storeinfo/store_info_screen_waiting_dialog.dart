@@ -155,10 +155,10 @@ class WaitingDialog extends ConsumerWidget {
             if (formKey.currentState!.validate() && agreement == true) {
               ref.read(agreementState.notifier).state = false;
               // 입력된 정보를 처리합니다.
-              print("전화번호: ${phoneNumberController.text}");
-              print("인원 수: $numberOfPerson");
-              print("가게 코드: $storeCode");
-              print("웨이팅 시작");
+              printd("전화번호: ${phoneNumberController.text}");
+              printd("인원 수: $numberOfPerson");
+              printd("가게 코드: $storeCode");
+              printd("웨이팅 시작");
               subscribeAndShowDialog(
                       context,
                       storeCode,
@@ -209,7 +209,7 @@ class WaitingDialog extends ConsumerWidget {
       String numberOfPersons,
       WidgetRef ref) async {
     // 스트림 구독
-    print("subscribeAndShowDialog");
+    printd("subscribeAndShowDialog");
 
     final waitingResult = await ref
         .read(storeWaitingRequestNotifierProvider.notifier)
