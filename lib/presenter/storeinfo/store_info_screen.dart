@@ -37,11 +37,10 @@ class StoreDetailInfoWidget extends ConsumerStatefulWidget {
   });
 
   @override
-  // ignore: library_private_types_in_public_api
-  _StoreDetailInfoWidgetState createState() => _StoreDetailInfoWidgetState();
+  StoreDetailInfoWidgetState createState() => StoreDetailInfoWidgetState();
 }
 
-class _StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
+class StoreDetailInfoWidgetState extends ConsumerState<StoreDetailInfoWidget>
     with WidgetsBindingObserver {
   @override
   void initState() {
@@ -127,6 +126,7 @@ class _NonNullStoreDetailInfoWidgetState
   @override
   void initState() {
     super.initState();
+    // appNavigatorService(widget.storeDetailInfo, context, false);
     initializePackageInfo(ref);
   }
 
@@ -242,7 +242,8 @@ class _NonNullStoreDetailInfoWidgetState
                     minSize: Size(90.w, 50.h),
                     maxSize: Size(90.w, 50.h),
                     onPressed: () async {
-                      appNavigatorService(widget.storeDetailInfo, context);
+                      appNavigatorService(
+                          widget.storeDetailInfo, context, true);
                     },
                   ),
                   SizedBox(

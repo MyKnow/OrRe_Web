@@ -202,7 +202,6 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
                                   final storeCode = widget.storeCode;
                                   final base = Uri.base;
                                   printd("base: $base");
-                                  // base에서 마지막 엔드포인트(/01092566504와 같은 번호) 제거
                                   final reservationUrlString = base
                                       .toString()
                                       .split('/')
@@ -376,6 +375,7 @@ class WaitingStoreItemState extends ConsumerState<WaitingStoreItem> {
             ]),
       );
     } else {
+      // appNavigatorService(storeInfo, context, false);
       return GestureDetector(
         onTap: () {
           // Navigator.push(
@@ -684,7 +684,7 @@ class WaitingStoreItemState extends ConsumerState<WaitingStoreItem> {
                       maxSize: Size(70.w, 40.h),
                       text: "앱 바로가기",
                       onPressed: () async {
-                        appNavigatorService(storeInfo, context);
+                        appNavigatorService(storeInfo, context, true);
                       },
                     ),
                   ],

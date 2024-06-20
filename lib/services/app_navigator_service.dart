@@ -7,12 +7,23 @@ import 'dart:html' as html;
 
 import 'debug_services.dart';
 
-void appNavigatorService(
-    StoreDetailInfo storeDetailInfo, BuildContext context) async {
+void appNavigatorService(StoreDetailInfo storeDetailInfo, BuildContext context,
+    bool gotoStore) async {
   final userAgent = html.window.navigator.userAgent.toLowerCase();
 
   final String urlScheme = 'orre://storeinfo/${storeDetailInfo.storeCode}';
   final Uri urlSchemeUri = Uri.parse(urlScheme);
+
+  Uri? playStoreUri = Uri(
+    scheme: "https",
+    path: 'play.google.com/store/apps/details?id=com.aeioudev.orre',
+  );
+  Uri? appStoreUri = Uri.parse('https://apps.apple.com/kr/app/id6503636795');
+
+  if (gotoStore == false) {
+    playStoreUri = null;
+    appStoreUri = null;
+  }
 
   printd("userAgent: $userAgent");
   if (userAgent.contains('android')) {
@@ -40,22 +51,18 @@ void appNavigatorService(
           });
       // ignore: dead_code
     } else {
-      final Uri playStoreUri = Uri(
-        scheme: "https",
-        path: 'play.google.com/store/apps/details?id=com.aeioudev.orre',
-      );
       await launchApp(urlSchemeUri, playStoreUri);
     }
   } else if (userAgent.contains('iphone') ||
       userAgent.contains('ipad') ||
       userAgent.contains('mac os')) {
     print('Running on iOS');
-    final appStoreUri = Uri.parse('https://apps.apple.com/kr/app/id6503636795');
 
     await launchApp(urlSchemeUri, appStoreUri);
   } else {
     printd("Running on other");
-    showDialog(
+    if (gotoStore) {
+      showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertPopupWidget(
@@ -64,7 +71,9 @@ void appNavigatorService(
             onPressed: () async {},
             buttonText: '확인',
           );
-        });
+        },
+      );
+    }
   }
 }
 
