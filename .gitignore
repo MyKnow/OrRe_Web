@@ -39,7 +39,8 @@ app.*.symbols
 app.*.map.json
 
 # web ignore
-web/index.html
+index.html
+
 
 # secret ignore
 .env
