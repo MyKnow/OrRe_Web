@@ -13,7 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:orre_web/services/debug_services.dart';
 import 'package:stomp_dart_client/stomp_dart_client.dart';
 
-import '../https/get_service_log_state_notifier.dart';
+import '../../../model/store_service_log_model.dart';
 
 final cancelDialogStatus = StateProvider<int?>((ref) => null);
 

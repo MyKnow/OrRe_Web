@@ -12,7 +12,7 @@ final nowLocationProvider =
 class LocationStateNotifier extends StateNotifier<LocationInfo?> {
   bool _isUpdating = false;
 
-  LocationStateNotifier(Ref _ref) : super(null);
+  LocationStateNotifier(Ref ref) : super(null);
 
   Future<LocationInfo?> updateNowLocation() async {
     if (_isUpdating) {

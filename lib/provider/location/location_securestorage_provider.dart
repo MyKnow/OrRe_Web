@@ -10,12 +10,12 @@ import 'now_location_provider.dart';
 
 class LocationListNotifier extends StateNotifier<LocationState> {
   late Ref ref;
-  LocationListNotifier(Ref _ref) : super(LocationState()) {
-    ref = _ref;
+  LocationListNotifier(Ref ref) : super(LocationState()) {
+    ref = ref;
     _init();
   }
 
-  final _storage = FlutterSecureStorage();
+  final _storage = const FlutterSecureStorage();
 
   Future<void> _init() async {
     await loadLocations();
@@ -104,7 +104,7 @@ class LocationListNotifier extends StateNotifier<LocationState> {
 
   // "nowLocation"을 현재 위치 정보로 업데이트하는 메서드
   Future<void> updateNowLocation(LocationInfo newLocation) async {
-    printd("updateNowLocation " + newLocation.locationName);
+    printd("updateNowLocation ${newLocation.locationName}");
     // "nowLocation"을 찾습니다.
     int index = state.customLocations
         .indexWhere((loc) => loc.locationName == "nowLocation");

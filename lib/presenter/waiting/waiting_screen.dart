@@ -21,6 +21,7 @@ import 'package:orre_web/widget/text/text_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../model/store_service_log_model.dart';
 import '../../provider/app_state_provider.dart';
 import '../../provider/network/websocket/store_detail_info_state_notifier.dart';
 import '../../provider/network/websocket/store_waiting_info_request_state_notifier.dart';
@@ -330,14 +331,15 @@ class WaitingStoreItem extends ConsumerStatefulWidget {
   const WaitingStoreItem({super.key, required this.userLog});
 
   @override
-  _WaitingStoreItemState createState() =>
-      _WaitingStoreItemState(userLog: userLog);
+  ConsumerState<ConsumerStatefulWidget> createState() {
+    return WaitingStoreItemState(userLog: userLog);
+  }
 }
 
-class _WaitingStoreItemState extends ConsumerState<WaitingStoreItem> {
+class WaitingStoreItemState extends ConsumerState<WaitingStoreItem> {
   final UserLogs userLog;
 
-  _WaitingStoreItemState({required this.userLog});
+  WaitingStoreItemState({required this.userLog});
 
   @override
   void initState() {
@@ -345,6 +347,7 @@ class _WaitingStoreItemState extends ConsumerState<WaitingStoreItem> {
     initializePackageInfo(ref);
   }
 
+  @override
   @override
   Widget build(BuildContext context) {
     printd("WaitingStoreItem build");
