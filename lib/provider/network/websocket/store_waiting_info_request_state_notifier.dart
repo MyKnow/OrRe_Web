@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_final_fields
+
 import 'dart:async';
 import 'dart:convert';
 
@@ -42,7 +44,7 @@ final storeWaitingRequestNotifierProvider =
 class StoreWaitingRequestNotifier extends StateNotifier<StoreWaitingRequest?> {
   StompClient? _client;
   late Ref ref;
-  final _storage = FlutterSecureStorage();
+  final _storage = const FlutterSecureStorage();
 
   // Map<int, Completer> completers = {};
 
