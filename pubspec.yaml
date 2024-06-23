@@ -1,7 +1,7 @@
 name: orre_web
 description: "원격 웨이팅, 원격 주문"
 publish_to: 'none'
-version: 1.0.6+7
+version: 1.1.0+8
 
 environment:
   sdk: '>=3.3.4 <4.0.0'

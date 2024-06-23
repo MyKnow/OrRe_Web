@@ -1,0 +1,55 @@
+# Name: Flutter Web Build And Deploy
+name: CI/CD Pipeline with Nginx
+
+on:
+  pull_request:
+    branches: [ "main" ]
+    types: [opened]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Flutter SDK
+        uses: subosito/flutter-action@v2.12.0
+        with:
+          channel: 'stable'
+          flutter-version: '3.19.6'
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Decrypt index.html.enc
+        run: openssl aes-256-cbc -pbkdf2 -in web/index.html -out web/index.html.enc -k ${{ secrets.INDEX_HTML_PASSWORD}}
+
+      - name: Decrypt .env.enc
+        run: openssl aes-256-cbc -d -pbkdf2 -in .env.enc -out .env -k ${{ secrets.ENV_PASSWORD }}
+      
+      - name: Build Web
+        run: flutter build web --release
+
+      - name: Check All Files
+        run: ls -la
+
+      - name: Check PWD
+        run: pwd
+      
+
+    #   - name: SSH into EC2, update web files, and restart NGINX
+    #     uses: appleboy/ssh-action@v0.1.3
+    #     with:
+    #       host: ${{ secrets.EC2_HOST }}
+    #       username: ${{ secrets.EC2_USER }}
+    #       key: ${{ secrets.SSH_PRIVATE_KEY }}
+    #       port: ${{ secrets.EC2_PORT }}
+    #       script: |
+    #         sudo systemctl stop nginx
+    #         cd /home/ubuntu
+    #         rm -rf *
+    #         mkdir web_server
+    #         cd web_server
+    #         git clone https://github.com/kolo4917/orre_web_server.git .
+    #         sudo systemctl restart nginx

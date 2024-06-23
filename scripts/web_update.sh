@@ -6,9 +6,6 @@ echo -e "Starting web update process...\n"
 echo -e "Updating licenses...\n"
 flutter pub run flutter_oss_licenses:generate.dart
 
-
-cd ..
-
 # Read current version and build number from pubspec.yaml
 current_version=$(grep 'version: ' pubspec.yaml | sed 's/version: //')
 major=$(echo $current_version | cut -d '.' -f1)
@@ -21,7 +18,8 @@ echo -e "\nSelect the version update type(Now Version: $current_version):"
 echo "1: Main Version Update (+1.x.x)"
 echo "2: Sub Version Update (x.+1.x)"
 echo "3: Minor Version Update (x.x.+1)"
-read -p "Enter choice (1-3): " choice
+echo "4: No Version Update"
+read -p "Enter choice (1-4): " choice
 
 
 # Update version based on user input
@@ -37,6 +35,10 @@ case $choice in
     ;;
   3) # Minor version update
     let minor+=1
+    ;;
+  4) # No version update
+    echo "No version update."
+    let build-=1
     ;;
   *)
     echo "Invalid choice."
